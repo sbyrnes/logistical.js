@@ -15,8 +15,10 @@
     "learning",
     "matrix"
   ],
-  "homepage" : "https://github.com/sbyrnes/logistical.js",
-  "bugs" : { "url" : "https://github.com/sbyrnes/logistical.js/issues"},
+  "homepage": "https://github.com/sbyrnes/logistical.js",
+  "bugs": {
+    "url": "https://github.com/sbyrnes/logistical.js/issues"
+  },
   "main": "./logistical.js",
   "maintainers": [
     {
@@ -25,14 +27,16 @@
       "url": "http://fogstack.com"
     }
   ],
-  "repository" :
-    { "type" : "git",
-      "url" : "https://github.com/sbyrnes/logistical.js"
-    },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sbyrnes/logistical.js"
+  },
   "dependencies": {},
   "devDependencies": {
     "blanket": "^1.1.6",
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.0",
     "mocha": "^2.0.1"
-   },
+  },
   "optionalDependencies": {}
 }

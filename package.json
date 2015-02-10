@@ -1,5 +1,5 @@
 {
-  "name": "logistical.js",
+  "name": "logistical",
   "description": "Logistic regression classifier for Node.js applications.",
   "version": "0.0.1",
   "engines": {
@@ -34,6 +34,7 @@
   "dependencies": {},
   "devDependencies": {
     "blanket": "^1.1.6",
+    "csv-parse": "0.0.6",
     "gulp": "^3.8.11",
     "gulp-mocha": "^2.0.0",
     "mocha": "^2.0.1"

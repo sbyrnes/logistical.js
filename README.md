@@ -1,5 +1,6 @@
 # logistical.js
-A classification library using logistic regression written in pure Javascript, available for Node.js.
+WORK IN PROGRESS
+A classification library using logistic regression written in pure Javascript, available for Node.js. 
 
 Description
 ---------

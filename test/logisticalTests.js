@@ -18,7 +18,7 @@ describe('Logistical', function(){
 
         contents = output;
         verification = contents.slice(0, 100);
-        training = contents.slice(100,contents.length - 1);
+        training = contents.slice(100, contents.length - 1);
         done();
       });
     });

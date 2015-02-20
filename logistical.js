@@ -4,7 +4,7 @@ classifier.prototype.train = function(result, data) {
 };
 
 classifier.prototype.classify = function(data) {
-  return 1;
+  return data[data.length - 1];
 };
 
 module.exports = classifier;

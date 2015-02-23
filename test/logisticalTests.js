@@ -31,6 +31,14 @@ describe('Logistical', function(){
   });
 
 
+  describe('#logit', function() {
+    it('correctly calculates the logit function', function(){
+      var result = 0.5;
+      var value = 0.0;
+      assert.equal(result, subject.logit(value));
+    });
+  });
+
   describe('#classify', function(){
     it('correctly classifies test data', function(){
       for(var i=0; i < verification.length; i++) {

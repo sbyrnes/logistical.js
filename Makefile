@@ -1,6 +1,6 @@
 test: tests
 tests:
-	./node_modules/gulp/bin/gulp.js
+	./node_modules/gulp/bin/gulp.js mocha
 
 watch:
 	./node_modules/gulp/bin/gulp.js watch-mocha

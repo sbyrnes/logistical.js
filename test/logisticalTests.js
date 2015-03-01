@@ -18,7 +18,7 @@ describe('Logistical', function(){
 
         contents = output;
         verification = contents.slice(0, 100);
-        training = contents.slice(100,contents.length - 1);
+        training = contents.slice(100, contents.length - 1);
         done();
       });
     });
@@ -30,6 +30,14 @@ describe('Logistical', function(){
     done();
   });
 
+
+  describe('#logit', function() {
+    it('correctly calculates the logit function', function(){
+      var result = 0.5;
+      var value = 0.0;
+      assert.equal(result, subject.logit(value));
+    });
+  });
 
   describe('#classify', function(){
     it('correctly classifies test data', function(){

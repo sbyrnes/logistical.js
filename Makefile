@@ -1,8 +1,11 @@
 test: tests
 tests:
-	./node_modules/mocha/bin/mocha
+	./node_modules/gulp/bin/gulp.js mocha
 
-debug-t:
+watch:
+	./node_modules/gulp/bin/gulp.js watch-mocha
+
+debug-tests:
 	./node_modules/mocha/bin/mocha debug
 
 coverage:

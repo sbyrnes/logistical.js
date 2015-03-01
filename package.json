@@ -31,12 +31,15 @@
     "type": "git",
     "url": "https://github.com/sbyrnes/logistical.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "sylvester": "0.0.21"
+  },
   "devDependencies": {
     "blanket": "^1.1.6",
     "csv-parse": "0.0.6",
     "gulp": "^3.8.11",
     "gulp-mocha": "^2.0.0",
+    "mathjs": "^1.3.0",
     "mocha": "^2.0.1"
   },
   "optionalDependencies": {}

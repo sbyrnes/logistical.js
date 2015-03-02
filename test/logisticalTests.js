@@ -42,10 +42,14 @@ describe('Logistical', function(){
     done();
   });
 
-  /* Test computation of the logistic function */
   describe('#logistic', function() {
-    it('correctly calculates the logit function', function(){
+    it('correctly calculates the logistic function', function(){
+      // expected values found using Wolfram Alpha:
+      // (http://www.wolframalpha.com/input/?i=logistic+sigmoid+%280.75%29)
       assert.equal(0.5, subject.logistic(0.0));
+      assert.equal(0.88080, subject.logistic(2).toFixed(5));
+      assert.equal(0.73106, subject.logistic(1.0).toFixed(5));
+      assert.equal(0.67918, subject.logistic(0.75).toFixed(5));
     });
   });
 

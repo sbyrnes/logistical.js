@@ -30,12 +30,10 @@ describe('Logistical', function(){
     done();
   });
 
-
-  describe('#logit', function() {
-    it('correctly calculates the logit function', function(){
-      var result = 0.5;
-      var value = 0.0;
-      assert.equal(result, subject.logit(value));
+  /* Test computation of the logistic function */
+  describe('#logistic', function() {
+    it(' validates function works for known values', function(){
+      assert.equal(0.5, subject.logistic(0.0));
     });
   });
 

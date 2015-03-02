@@ -1,14 +1,25 @@
+/* logistical.js
+ * A logistical regression classifier for Node.js
+ *
+ * Authors: Wes Bailey @baywes, Sean Byrnes @sbyrnes
+ * Copyright 2015
+ *
+ * Made available via the MIT License, text included in LICENSE.
+ */
+
 var fs = require("fs");
 var parse = require("csv-parse");
 var assert = require("assert");
-var classifier = require("../logistical.js");
+var Classifier = require("../logistical.js");
 
+/* Tests for main Classifier object. */
 describe('Logistical', function(){
-  var subject;
-  var contents;
-  var training;
-  var verfication;
+  var subject;      // Classifier to be tested
+  var contents;     // All training data
+  var training;     // Training data set
+  var verfication;  // Cross-validation data set
 
+  /* Tasks to complete before running any tests */
   before(function(done){
     fs.readFile(__dirname + '/data/verification.csv', function (readError, data) {
       if (readError) throw readError;
@@ -25,20 +36,20 @@ describe('Logistical', function(){
 
   });
 
+  /* Tasks to complete before running each test */
   beforeEach( function(done){
-    subject = new classifier();
+    subject = new Classifier();
     done();
   });
 
-
-  describe('#logit', function() {
+  /* Test computation of the logistic function */
+  describe('#logistic', function() {
     it('correctly calculates the logit function', function(){
-      var result = 0.5;
-      var value = 0.0;
-      assert.equal(result, subject.logit(value));
+      assert.equal(0.5, subject.logistic(0.0));
     });
   });
 
+    /* Test classification of a value based on some training data */
   describe('#classify', function(){
     it('correctly classifies test data', function(){
       for(var i=0; i < verification.length; i++) {

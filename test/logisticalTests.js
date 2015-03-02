@@ -74,6 +74,7 @@ describe('Logistical', function(){
     done();
   });
 
+  /* Test computation of the logistic function */
   describe('#logistic', function() {
     it('correctly calculates the logistic function', function(){
       // expected values found using Wolfram Alpha:

@@ -52,7 +52,7 @@ describe('Logistical', function(){
       },
       function(nextStep) {
         // Read large test data set
-        readCSVFile('/data/verification.csv', function(csvData){
+        readCSVFile('/data/large_data.csv', function(csvData){
           large.data         = csvData;
           large.validation   = csvData.slice(0, 100);
           large.training     = csvData.slice(100, csvData.length - 1);

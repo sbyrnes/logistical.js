@@ -25,7 +25,7 @@ Classifier.prototype.train = function(expectedValue, data) {
 
 /* Classifies the provided example. */
 Classifier.prototype.classify = function(data) {
-  return data[data.length - 1];
+  return 1;
 };
 
 module.exports = Classifier;

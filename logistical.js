@@ -1,16 +1,31 @@
+/* logistical.js
+ * A logistical regression classifier for Node.js
+ *
+ * Authors: Wes Bailey @baywes, Sean Byrnes @sbyrnes
+ * Copyright 2015
+ *
+ * Made available via the MIT License, text included in LICENSE.
+ */
+
 var math = require('mathjs');
 
-var classifier = function() {};
+/*
+ * Main classifier entity.
+ */
+var Classifier = function() {};
 
-classifier.prototype.logit = function(z) {
+/* Computes the logistic function value for a given input. */
+Classifier.prototype.logistic = function(z) {
   return 1.0 / (1.0 + math.exp(z));
 };
 
-classifier.prototype.train = function(result, data) {
+/* Trains the classifier on a given training example. */
+Classifier.prototype.train = function(expectedValue, data) {
 };
 
-classifier.prototype.classify = function(data) {
+/* Classifies the provided example. */
+Classifier.prototype.classify = function(data) {
   return data[data.length - 1];
 };
 
-module.exports = classifier;
+module.exports = Classifier;

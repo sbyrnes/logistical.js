@@ -76,7 +76,7 @@ describe('Logistical', function(){
 
   /* Test computation of the logistic function */
   describe('#logistic', function() {
-    it('correctly calculates the logistic function', function(){
+    it(' validates function works for known values', function(){
       // expected values found using Wolfram Alpha:
       // (http://www.wolframalpha.com/input/?i=logistic+sigmoid+%280.75%29)
       assert.equal(0.5, subject.logistic(0.0));

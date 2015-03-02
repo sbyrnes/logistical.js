@@ -44,7 +44,7 @@ describe('Logistical', function(){
 
   /* Test computation of the logistic function */
   describe('#logistic', function() {
-    it('correctly calculates the logit function', function(){
+    it(' validates function works for known values', function(){
       assert.equal(0.5, subject.logistic(0.0));
     });
   });

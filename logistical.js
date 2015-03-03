@@ -30,7 +30,7 @@ Classifier.prototype.zi = function(Wk, Xik) {
 
 /* Computes the logistic function value for a given input. */
 Classifier.prototype.logistic = function(z) {
-  return 1.0 / (1.0 + math.exp(-z));
+  return 1.0 / (1.0 + Math.exp(-z));
 };
 
 /* Trains the classifier on a given training example. */

@@ -48,7 +48,7 @@ describe('Logistical', function(){
           small.training   = csvData.slice(5, csvData.length - 1);
 
           nextStep();
-        })
+        });
       },
       function(nextStep) {
         // Read large test data set
@@ -58,12 +58,12 @@ describe('Logistical', function(){
           large.training     = csvData.slice(100, csvData.length - 1);
 
           nextStep();
-        })
+        });
       }],
       function(err, results) {
         done();
       }
-    )
+    );
 
 
   });
@@ -92,7 +92,7 @@ describe('Logistical', function(){
       // Train the classifier
       for(var i=0; i < small.training.length; i++) {
         subject.train(small.training[i][small.resultIndex],
-                      small.training[i].slice(0,small.resultIndex-1))
+                      small.training[i].slice(0,small.resultIndex-1));
       }
 
       // Verify correct classification
@@ -107,7 +107,7 @@ describe('Logistical', function(){
       // Train the classifier
       for(var i=0; i < large.training.length; i++) {
         subject.train(large.training[i][large.resultIndex],
-                      large.training[i].slice(0,large.resultIndex-1))
+                      large.training[i].slice(0,large.resultIndex-1));
       }
 
       // Verify correct classification

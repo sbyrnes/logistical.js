@@ -7,7 +7,7 @@
  * Made available via the MIT License, text included in LICENSE.
  */
 
-var LinearAlgebra = require('sylvester');
+var Linear = require('sylvester');
 
 /*
  * Main classifier entity.
@@ -19,11 +19,11 @@ var Classifier = function() {};
  */
 Classifier.prototype.zi = function(Wk, Xik) {
   // Validate that we have matrix parameters
-  if ( !(Xk instanceof LinearAlgebra.Vector) ) {
+  if ( !(Wk instanceof Linear.Vector) ) {
     throw new TypeError("Wk needs to be of type Vector");
   }
 
-  if ( !(Xik instanceof LinearAlgebra.Matrix) ) {
+  if ( !(Xik instanceof Linear.Matrix) ) {
     throw new TypeError("Xik needs to be of type Matrix");
   }
 };

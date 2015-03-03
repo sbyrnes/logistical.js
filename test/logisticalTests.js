@@ -12,6 +12,7 @@ var fs = require("fs");
 var parse = require("csv-parse");
 var assert = require("assert");
 var async = require("async");
+var linear = require("sylvester");
 
 // module under test
 var Classifier = require("../logistical.js");
@@ -86,7 +87,18 @@ describe('Logistical', function(){
     });
   });
 
-    /* Test classification of a value based on some training data */
+  /* Test the intermediate sum function used in the calculation of likelihood */
+  describe('#zi', function() {
+    it('tests arguments for the correct type', function() {
+      var x = new linear.Vector();
+      var y = new linear.Matrix();
+
+      assert.doesNotThrow( function() { subject.zi(x, y); }, TypeError);
+      assert.throws( function() { subject.zi(2, 'bad'); }, TypeError);
+    });
+  });
+
+  /* Test classification of a value based on some training data */
   describe('#classify', function(){
     it('correctly classifies small test data', function(){
       // Train the classifier
@@ -103,6 +115,7 @@ describe('Logistical', function(){
         assert.equal(result, subject.classify(test));
       }
     });
+
     it('correctly classifies large test data', function(){
       // Train the classifier
       for(var i=0; i < large.training.length; i++) {

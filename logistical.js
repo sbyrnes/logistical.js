@@ -17,15 +17,33 @@ var Classifier = function() {};
 /*
  * Intermediate funtion for calculating the likelihood
  */
-Classifier.prototype.zi = function(Wk, Xik) {
-  // Validate that we have matrix parameters
-  if ( !(Wk instanceof Linear.Vector) ) {
-    throw new TypeError("Wk needs to be of type Vector");
+Classifier.prototype.zi = function(W, Xi) {
+  // Validate that we have the correct matrix parameters
+  if ( !(W instanceof Linear.Vector) ) {
+    throw new TypeError("W needs to be of type Vector");
   }
 
-  if ( !(Xik instanceof Linear.Matrix) ) {
-    throw new TypeError("Xik needs to be of type Matrix");
+  if ( !(Xi instanceof Linear.Vector) ) {
+    throw new TypeError("Xi needs to be of type Matrix");
   }
+
+  // validate that both vectors have the same number of elements
+  var NW = W.elements.length;
+  var NXi = Xi.elements.length;
+
+  if ( NW == NXi ) {
+    N = NW;
+  } else {
+    throw new Error('Vectors must have the same number of elements');
+  }
+
+  var k = 1, sum = 0;
+
+  for (k=1; k<=N; k++) {
+    sum += W.e(k) * Xi.e(k);
+  }
+
+  return sum;
 };
 
 /* Computes the logistic function value for a given input. */

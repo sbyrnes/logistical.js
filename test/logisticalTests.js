@@ -70,9 +70,8 @@ describe('Logistical', function(){
   });
 
   /* Tasks to complete before running each test */
-  beforeEach( function(done){
+  beforeEach( function() {
     subject = new Classifier();
-    done();
   });
 
   /* Test computation of the logistic function */
@@ -89,12 +88,29 @@ describe('Logistical', function(){
 
   /* Test the intermediate sum function used in the calculation of likelihood */
   describe('#zi', function() {
-    it('tests arguments for the correct type', function() {
-      var x = new linear.Vector();
-      var y = new linear.Matrix();
+    var W, X;
 
-      assert.doesNotThrow( function() { subject.zi(x, y); }, TypeError);
+    beforeEach( function() {
+      W = linear.Vector.create([1,2]);
+      X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+    });
+
+    it('tests arguments for the correct type', function() {
+      assert.doesNotThrow( function() { subject.zi(W, X.row(1)); }, TypeError );
       assert.throws( function() { subject.zi(2, 'bad'); }, TypeError);
+    });
+
+    it('tests that the vectors have the same number of elements', function() {
+      var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
+
+      assert.doesNotThrow( function() { subject.zi(W, X.row(1)); }, Error );
+      assert.throws( function() {subject.zi(W. Z.row(1)); }, Error);
+    });
+
+    it('calculates the proper sum', function() {
+      assert.equal(5, subject.zi(W, X.row(1)));
+      assert.equal(11, subject.zi(W, X.row(2)));
+      assert.equal(17, subject.zi(W, X.row(3)));
     });
   });
 

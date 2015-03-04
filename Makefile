@@ -11,3 +11,9 @@ debug-tests:
 coverage:
 	./node_modules/mocha/bin/mocha -r blanket -R html-cov > coverage.html	
 	open coverage.html
+
+.PHONY: list
+
+targets: list
+list:
+	@grep '^\w' Makefile | sed 's/:.*//' | sort | uniq

@@ -15,9 +15,9 @@ var Linear = require('sylvester');
 var Classifier = function() {};
 
 /*
- * Intermediate funtion for calculating the likelihood
+ * Intermediate function for calculating the partial sum for the likelihood
  */
-Classifier.prototype.zi = function(W, Xi) {
+Classifier.prototype.ZiPartialSum = function(W, Xi) {
   // Validate that we have the correct matrix parameters
   if ( !(W instanceof Linear.Vector) ) {
     throw new TypeError("W needs to be of type Vector");

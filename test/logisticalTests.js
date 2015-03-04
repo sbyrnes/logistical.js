@@ -87,7 +87,7 @@ describe('Logistical', function(){
   });
 
   /* Test the intermediate sum function used in the calculation of likelihood */
-  describe('#zi', function() {
+  describe('#ZiPartialSum', function() {
     var W, X;
 
     beforeEach( function() {
@@ -96,21 +96,21 @@ describe('Logistical', function(){
     });
 
     it('tests arguments for the correct type', function() {
-      assert.doesNotThrow( function() { subject.zi(W, X.row(1)); }, TypeError );
-      assert.throws( function() { subject.zi(2, 'bad'); }, TypeError);
+      assert.doesNotThrow( function() { subject.ZiPartialSum(W, X.row(1)); }, TypeError );
+      assert.throws( function() { subject.ZiPartialSum(2, 'bad'); }, TypeError);
     });
 
     it('tests that the vectors have the same number of elements', function() {
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
-      assert.doesNotThrow( function() { subject.zi(W, X.row(1)); }, Error );
-      assert.throws( function() {subject.zi(W. Z.row(1)); }, Error);
+      assert.doesNotThrow( function() { subject.ZiPartialSum(W, X.row(1)); }, Error );
+      assert.throws( function() {subject.ZiPartialSum(W. Z.row(1)); }, Error);
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(5, subject.zi(W, X.row(1)));
-      assert.equal(11, subject.zi(W, X.row(2)));
-      assert.equal(17, subject.zi(W, X.row(3)));
+      assert.equal(5, subject.ZiPartialSum(W, X.row(1)));
+      assert.equal(11, subject.ZiPartialSum(W, X.row(2)));
+      assert.equal(17, subject.ZiPartialSum(W, X.row(3)));
     });
   });
 

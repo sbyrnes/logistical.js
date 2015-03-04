@@ -116,7 +116,8 @@ describe('Logistical', function(){
 
   /* Test classification of a value based on some training data */
   describe('#classify', function(){
-    it('correctly classifies small test data', function(){
+    it('correctly classifies small test data');
+    /*, function(){
       // Train the classifier
       for(var i=0; i < small.training.length; i++) {
         subject.train(small.training[i][small.resultIndex],
@@ -131,8 +132,10 @@ describe('Logistical', function(){
         assert.equal(result, subject.classify(test));
       }
     });
+    */
 
-    it('correctly classifies large test data', function(){
+    it('correctly classifies large test data');
+    /*, function(){
       // Train the classifier
       for(var i=0; i < large.training.length; i++) {
         subject.train(large.training[i][large.resultIndex],
@@ -147,6 +150,7 @@ describe('Logistical', function(){
         assert.equal(result, subject.classify(test));
       }
     });
+    */
   });
 });
 

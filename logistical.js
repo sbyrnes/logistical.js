@@ -16,18 +16,21 @@ var Classifier = function() {};
 
 /*
  * Intermediate function for calculating the partial sum for the likelihood
+ *
+ * w = vector coefficients with k elements
+ * Xi = vector of training data with k elements
  */
-Classifier.prototype.ZiPartialSum = function(W, Xi) {
+Classifier.prototype.ZiPartialSum = function(w, Xi) {
   var validator = new Validator();
 
-  validator.isVector(W, Xi);
+  validator.isVector(w, Xi);
 
-  var N = validator.hasEqualElementCount(W, Xi);
+  var N = validator.hasEqualElementCount(w, Xi);
 
   var sum = 0;
 
   for ( var k = 1; k <= N; k++) {
-    sum += W.e(k) * Xi.e(k);
+    sum += w.e(k) * Xi.e(k);
   }
 
   return sum;
@@ -35,13 +38,24 @@ Classifier.prototype.ZiPartialSum = function(W, Xi) {
 
 /*
  * Compute the likelihood for a set of coefficients, data and labels
+ *
+ * w = vector coefficients
+ * Y = array of labels for the data (Y1, Y2, ..., Yn)
+ * X = array of training data vecors (X1, X2, ..., Xn)
  */
-Classifier.prototype.likelihood = function(W, Yi, Xi) {
+Classifier.prototype.likelihood = function(w, Y, X) {
   var val = new Validator();
 
-  val.isVector(W, Yi, Xi);
+  val.isVector(W);
 
-  var N = validator.hasEqualElementCount(W, Yi, Xi);
+  var N = Y.length;
+
+  var sum = 0;
+
+  for (var i = 0; i < N; i++) {
+    sum += Math.log( this.logistic(Y[i] * this.ZiPartialSum(w, X[i])));
+  }
+
 };
 
 /*

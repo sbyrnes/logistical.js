@@ -1,9 +1,11 @@
 test: tests
 tests:
-	./node_modules/gulp/bin/gulp.js mocha
+	#./node_modules/gulp/bin/gulp.js mocha
+	./node_modules/mocha/bin/mocha 
 
 watch:
-	./node_modules/gulp/bin/gulp.js watch-mocha
+	#./node_modules/gulp/bin/gulp.js watch-mocha
+	./node_modules/mocha/bin/mocha watch
 
 debug-tests:
 	./node_modules/mocha/bin/mocha debug

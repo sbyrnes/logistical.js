@@ -88,29 +88,68 @@ describe('Logistical', function(){
 
   /* Test the intermediate sum function used in the calculation of likelihood */
   describe('#ZiPartialSum', function() {
-    var W, X;
+    var w, X;
 
     beforeEach( function() {
-      W = linear.Vector.create([1,2]);
+      w = linear.Vector.create([1,2]);
       X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
     });
 
     it('tests arguments for the correct type', function() {
-      assert.doesNotThrow( function() { subject.ZiPartialSum(W, X.row(1)); }, TypeError );
+      assert.doesNotThrow( function() { subject.ZiPartialSum(w, X.row(1)); }, TypeError );
       assert.throws( function() { subject.ZiPartialSum(2, 'bad'); }, TypeError);
     });
 
     it('tests that the vectors have the same number of elements', function() {
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
-      assert.doesNotThrow( function() { subject.ZiPartialSum(W, X.row(1)); }, Error );
-      assert.throws( function() {subject.ZiPartialSum(W. Z.row(1)); }, Error);
+      assert.doesNotThrow( function() { subject.ZiPartialSum(w, X.row(1)); }, Error );
+      assert.throws( function() {subject.ZiPartialSum(w. Z.row(1)); }, Error);
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(5, subject.ZiPartialSum(W, X.row(1)));
-      assert.equal(11, subject.ZiPartialSum(W, X.row(2)));
-      assert.equal(17, subject.ZiPartialSum(W, X.row(3)));
+      assert.equal(5, subject.ZiPartialSum(w, X.row(1)));
+      assert.equal(11, subject.ZiPartialSum(w, X.row(2)));
+      assert.equal(17, subject.ZiPartialSum(w, X.row(3)));
+    });
+  });
+
+  describe('#likelihood', function() {
+    it('computes the likelihood for a single dependent variable', function() {
+      var w = linear.Vector.create([1]);
+      var X = new linear.Matrix.create([[1],[3],[6]]);
+      var Y = [1,0,1];
+
+      /*
+       * Simple enough to outline the component steps
+       *
+       * Z[0] = 1*1
+       * logistic[0] = 1/(1 + exp(-1))
+       * sum[0] = log(1 * 1/(1 + exp(-1))
+       *
+       * Z[1] = 1*3
+       * logistic[1] = 1/(1 + exp(-3))
+       * sum[1] = log(-1 *  1/(1 + exp(-3))
+       *
+       * Z[2] = 1*6
+       * logistic[2] = 1/(1 + exp(-6))
+       * sum[2] = log(1 * 1/(1 + exp(-6)))
+       *
+       * L(w) = sum[0] + sum[1] + sum[2]
+       *      = 
+       */
+      // from wolfrom alpha
+      // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
+      assert.equal(-0.36342, subject.likelihood(w, Y, X).toFixed(5));
+    });
+
+    it('computes the likelihood for 2 dependent variables', function() {
+      var w = linear.Vector.create([1,1]);
+      var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+      var Y = [1,-1,1];
+      // from wolfrom alpha
+      // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
+      assert.equal(-0.74175, subject.likelihood(w, Y, X).toFixed(5));
     });
   });
 

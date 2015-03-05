@@ -39,23 +39,24 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 /*
  * Compute the likelihood for a set of coefficients, data and labels
  *
- * w = vector coefficients
+ * w = Vector coefficients
  * Y = array of labels for the data (Y1, Y2, ..., Yn)
- * X = array of training data vecors (X1, X2, ..., Xn)
+ * X = Matrix of training data vecors (X1, X2, ..., Xn)
  */
 Classifier.prototype.likelihood = function(w, Y, X) {
   var val = new Validator();
 
-  val.isVector(W);
+  val.isVector(w);
 
   var N = Y.length;
 
   var sum = 0;
 
   for (var i = 0; i < N; i++) {
-    sum += Math.log( this.logistic(Y[i] * this.ZiPartialSum(w, X[i])));
+    sum += Math.log( this.logistic(Y[i] * this.ZiPartialSum(w, X.row(i+1))) );
   }
 
+  return sum;
 };
 
 /*

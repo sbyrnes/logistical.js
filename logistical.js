@@ -25,17 +25,13 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 
   validator.isVector(w, Xi);
 
-  var N = validator.hasEqualElementCount(w, Xi);
+  validator.hasEqualElementCount(w, Xi);
 
-  var sum = 0;
+  var sum = w.dot(Xi);
 
-  /*
-   * @refactor
-   * Shouldn't this just be the dot product of the two vectors?
-   */
-  for ( var k = 1; k <= N; k++) {
-    sum += w.e(k) * Xi.e(k);
-  }
+  // Need to try this as "failure" is a null return.  The challenge here is
+  // that this doesn't halp the caller.
+  if ( sum === null ) throw new Error('Unable to compute the dot product');
 
   return sum;
 };

@@ -52,6 +52,11 @@ Classifier.prototype.likelihood = function(w, Y, X) {
 
   val.isVector(w);
 
+  /*
+   * @refactor
+   * validation for matrix elements
+   */
+
   var N = Y.length;
 
   var sum = 0;

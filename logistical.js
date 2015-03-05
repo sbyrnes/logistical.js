@@ -29,6 +29,10 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 
   var sum = 0;
 
+  /*
+   * @refactor
+   * Shouldn't this just be the dot product of the two vectors?
+   */
   for ( var k = 1; k <= N; k++) {
     sum += w.e(k) * Xi.e(k);
   }

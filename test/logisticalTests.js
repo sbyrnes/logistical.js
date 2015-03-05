@@ -124,29 +124,29 @@ describe('Logistical', function(){
        * Simple enough to outline the component steps
        *
        * Z[0] = 1*1
-       * logistic[0] = 1/(1 + exp(-1))
-       * sum[0] = log(1 * 1/(1 + exp(-1))
+       * logistic[0] = 1/(1 + exp(-1*1))
+       * sum[0] = log(1 * 1/(1 + exp(-1*1)))
        *
        * Z[1] = 1*3
-       * logistic[1] = 1/(1 + exp(-3))
-       * sum[1] = log(-1 *  1/(1 + exp(-3))
+       * logistic[1] = 1/(1 + exp(-3*0))
+       * sum[1] = log(1/(1 + exp(-3*0)))
        *
        * Z[2] = 1*6
-       * logistic[2] = 1/(1 + exp(-6))
-       * sum[2] = log(1 * 1/(1 + exp(-6)))
+       * logistic[2] = 1/(1 + exp(-1*6))
+       * sum[2] = log(1/(1 + exp(-1*6)))
        *
        * L(w) = sum[0] + sum[1] + sum[2]
        *      = 
        */
       // from wolfrom alpha
-      // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-      assert.equal(-0.36342, subject.likelihood(w, Y, X).toFixed(5));
+      // http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
+      assert.equal(-1.00888, subject.likelihood(w, Y, X).toFixed(5));
     });
 
     it('computes the likelihood for 2 dependent variables', function() {
       var w = linear.Vector.create([1,1]);
       var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-      var Y = [1,-1,1];
+      var Y = [1,0,1];
       // from wolfrom alpha
       // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
       assert.equal(-0.74175, subject.likelihood(w, Y, X).toFixed(5));

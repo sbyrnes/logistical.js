@@ -33,13 +33,14 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 };
 
 /*
- * Compute the likelihood for a set of coefficients, data and labels
+ * Compute the log likelihood for a set of coefficients, data and labels
  *
  * w = Vector coefficients
  * Y = array of labels for the data (Y1, Y2, ..., Yn)
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
+ * C = Regularization constant
  */
-Classifier.prototype.logLikelihood = function(w, Y, X) {
+Classifier.prototype.logLikelihood = function(w, Y, X, C) {
   LinearValidator.isVector(w);
   LinearValidator.isArray(Y);
   LinearValidator.isMatrix(X);
@@ -53,6 +54,11 @@ Classifier.prototype.logLikelihood = function(w, Y, X) {
 
   for (var i = 0; i < N; i++) {
     sum += Math.log( this.logistic(Y[i] * this.ZiPartialSum(w, X.row(i+1))) );
+  }
+
+  // Account for regularization
+  if ( C > 0 ) {
+    sum = -sum + 0.5 * C * w.dot(w);
   }
 
   return sum;

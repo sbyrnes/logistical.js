@@ -1,4 +1,5 @@
-# logistical.js
+# logistical.js [![Code Climate](https://codeclimate.com/github/sbyrnes/logistical.js/badges/gpa.svg)](https://codeclimate.com/github/sbyrnes/logistical.js)
+
 WORK IN PROGRESS
 A classification library using logistic regression written in pure Javascript, available for Node.js. 
 

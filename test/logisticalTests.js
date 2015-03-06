@@ -154,42 +154,40 @@ describe('Logistical', function(){
   });
 
   /* Test classification of a value based on some training data */
-  describe('#classify', function(){
-    it('correctly classifies small test data');
-    /*, function(){
+  describe.skip('#classify', function() {
+    var i;
+
+    it('correctly classifies small test data', function() {
       // Train the classifier
-      for(var i=0; i < small.training.length; i++) {
+      for(i = 0; i < small.training.length; i++) {
         subject.train(small.training[i][small.resultIndex],
                       small.training[i].slice(0,small.resultIndex-1));
       }
 
       // Verify correct classification
-      for(var i=0; i < small.validation.length; i++) {
+      for(i = 0; i < small.validation.length; i++) {
         var test = small.validation[i].slice(0, small.resultIndex - 1);
         var result = small.validation[i][small.resultIndex];
 
         assert.equal(result, subject.classify(test));
       }
     });
-    */
 
-    it('correctly classifies large test data');
-    /*, function(){
+    it('correctly classifies large test data', function(){
       // Train the classifier
-      for(var i=0; i < large.training.length; i++) {
+      for(i = 0; i < large.training.length; i++) {
         subject.train(large.training[i][large.resultIndex],
                       large.training[i].slice(0,large.resultIndex-1));
       }
 
       // Verify correct classification
-      for(var i=0; i < large.validation.length; i++) {
+      for(i = 0; i < large.validation.length; i++) {
         var test = large.validation[i].slice(0, large.resultIndex - 1);
         var result = large.validation[i][large.resultIndex];
 
         assert.equal(result, subject.classify(test));
       }
     });
-    */
   });
 });
 

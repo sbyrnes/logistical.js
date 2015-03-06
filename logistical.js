@@ -26,8 +26,7 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 
   var sum = w.dot(Xi);
 
-  // Need to try this as "failure" is a null return.  The challenge here is
-  // that this doesn't halp the caller.
+  // play nice with the caller because null is technically a "failure"
   if ( sum === null ) throw new Error('Unable to compute the dot product');
 
   return sum;

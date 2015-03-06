@@ -24,18 +24,18 @@ describe('Logistical', function(){
   // Large data set, derived from 2015 NHTSB vehicle efficiency tests
   // http://www.fueleconomy.gov/feg/download.shtml
   var large = {};
-      large.data;         // Complete data set
-      large.training;     // Training data set
-      large.validation;   // Cross-validation data set
-      large.resultIndex = 12; // Index of the result value in the training sets
+      large.data = null;         // Complete data set
+      large.training = null;     // Training data set
+      large.validation = null;   // Cross-validation data set
+      large.resultIndex = 12;    // Index of the result value in the training sets
 
   // Small data set, derived from fake admissions data
   // http://www.ats.ucla.edu/stat/r/dae/exlogit.htm
   var small = {};
-      small.data;         // Complete data set
-      small.training;     // Training data set
-      small.validation;   // Cross-validation data set
-      small.resultIndex = 2; // Index of the result value in the training sets
+      small.data = null;         // Complete data set
+      small.training = null;     // Training data set
+      small.validation = null;   // Cross-validation data set
+      small.resultIndex = 2;     // Index of the result value in the training sets
 
   /* Tasks to complete before running any tests */
   before(function(done){
@@ -86,7 +86,7 @@ describe('Logistical', function(){
     });
   });
 
-  /* Test the intermediate sum function used in the calculation of likelihood */
+  /* Test the intermediate sum function used in the calculation of logLikelihood */
   describe('#ZiPartialSum', function() {
     var w, X;
 
@@ -114,8 +114,8 @@ describe('Logistical', function(){
     });
   });
 
-  describe('#likelihood', function() {
-    it('computes the likelihood for a single dependent variable', function() {
+  describe('#logLikelihood', function() {
+    it('computes the logLikelihood for a single dependent variable', function() {
       var w = linear.Vector.create([1]);
       var X = new linear.Matrix.create([[1],[3],[6]]);
       var Y = [1,0,1];
@@ -140,16 +140,16 @@ describe('Logistical', function(){
        */
       // from wolfrom alpha
       // http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
-      assert.equal(-1.00888, subject.likelihood(w, Y, X).toFixed(5));
+      assert.equal(-1.00888, subject.logLikelihood(w, Y, X).toFixed(5));
     });
 
-    it('computes the likelihood for 2 dependent variables', function() {
+    it('computes the logLikelihood for 2 dependent variables', function() {
       var w = linear.Vector.create([1,1]);
       var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
       var Y = [1,0,1];
       // from wolfrom alpha
       // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-      assert.equal(-0.74175, subject.likelihood(w, Y, X).toFixed(5));
+      assert.equal(-0.74175, subject.logLikelihood(w, Y, X).toFixed(5));
     });
   });
 

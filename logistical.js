@@ -40,7 +40,7 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * Y = array of labels for the data (Y1, Y2, ..., Yn)
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  */
-Classifier.prototype.likelihood = function(w, Y, X) {
+Classifier.prototype.logLikelihood = function(w, Y, X) {
   LinearValidator.isVector(w);
   LinearValidator.isArray(Y);
   LinearValidator.isMatrix(X);

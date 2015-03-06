@@ -12,9 +12,7 @@ var LinearValidator = require('./lib/linear_support.js');
 /*
  * Main classifier entity.
  */
-var Classifier = function() {
-  this.lv = new LinearValidator();
-};
+var Classifier = function() { };
 
 /*
  * Intermediate function for calculating the partial sum for the likelihood
@@ -23,7 +21,8 @@ var Classifier = function() {
  * Xi = vector of training data with k elements
  */
 Classifier.prototype.ZiPartialSum = function(w, Xi) {
-  this.lv.isVector(w, Xi).hasEqualElementCount(w, Xi);
+  LinearValidator.isVector(w, Xi);
+  LinearValidator.hasEqualElementCount(w, Xi);
 
   var sum = w.dot(Xi);
 
@@ -42,10 +41,12 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  */
 Classifier.prototype.likelihood = function(w, Y, X) {
-  this.lv.isVector(w).isArray(Y).isMatrix(X);
+  LinearValidator.isVector(w);
+  LinearValidator.isArray(Y);
+  LinearValidator.isMatrix(X);
 
   // Ensure the partial sum will not throw an error
-  this.lv.hasEqualElementCount(w, X.row(1));
+  LinearValidator.hasEqualElementCount(w, X.row(1));
 
   var N = Y.length;
 

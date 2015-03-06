@@ -23,9 +23,7 @@ var Classifier = function() {};
 Classifier.prototype.ZiPartialSum = function(w, Xi) {
   var validator = new Validator();
 
-  validator.isVector(w, Xi);
-
-  validator.hasEqualElementCount(w, Xi);
+  validator.isVector(w, Xi).hasEqualElementCount(w, Xi);
 
   var sum = w.dot(Xi);
 
@@ -44,14 +42,12 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  */
 Classifier.prototype.likelihood = function(w, Y, X) {
-  var val = new Validator();
+  var validator = new Validator();
 
-  val.isVector(w);
+  validator.isVector(w).isArray(Y).isMatrix(X);
 
-  /*
-   * @refactor
-   * validation for matrix elements
-   */
+  // Ensure the partial sum will not throw an error
+  validator.hasEqualElementCount(w, X.row(1));
 
   var N = Y.length;
 

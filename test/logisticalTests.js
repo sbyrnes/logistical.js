@@ -12,7 +12,7 @@ var fs = require("fs");
 var parse = require("csv-parse");
 var assert = require("assert");
 var async = require("async");
-var linear = require("sylvester");
+var linear = require("Sylvester");
 
 // module under test
 var Classifier = require("../logistical.js");
@@ -351,6 +351,32 @@ describe('Logistical', function(){
       }
     });
   });
+
+  describe('#generateRandomCoefficients', function() {
+    it('should not accept a negative value', function() {
+      var w1 = subject.generateRandomCoefficients(-5);
+
+      assert.ok(!w1);
+    });
+    it('should not accept a zero value', function() {
+      var w1 = subject.generateRandomCoefficients(0);
+
+      assert.ok(!w1);
+    });
+    it('should generate a different matrix every time', function() {
+      var w1 = subject.generateRandomCoefficients(10);
+      var w2 = subject.generateRandomCoefficients(10);
+
+      assert.ok(w1);
+      assert.ok(w2);
+
+      assert.equal(10, w1.dimensions().cols);
+      assert.equal(10, w2.dimensions().cols);
+
+      assert.ok(!w1.eql(w2));
+    });
+  });
+
 });
 
 /* Reads and parses a CSV file */

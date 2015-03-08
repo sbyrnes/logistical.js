@@ -8,7 +8,13 @@
  */
 
 var LinearValidator = require('./lib/linear_support.js');
-var Linear = require('sylvester');
+var Linear = require('Sylvester');
+
+// Learning parameters
+var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
+var ALPHA = 0.0005;       // learning rate, should be small
+var BETA = 0.0007;        // regularization factor, should be small
+var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
 
 /*
  * Main classifier entity.
@@ -104,6 +110,23 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   }
 
   return Linear.Vector.create(partialL);
+
+/*
+ * Randomly generates a vector of coefficients of the specified size.
+ */
+Classifier.prototype.generateRandomCoefficients = function(size) {
+  if(size < 1) return null;
+
+  return Linear.Vector.Random(size);
+}
+
+/*
+ * Calculates the error of the provided model as applied to the input data and expected outcomes.
+ */
+Classifier.prototype.calculateError = function(w, Y_exp, X) {
+  var error = 0.0;
+
+  return error;
 };
 
 /*
@@ -117,6 +140,7 @@ Classifier.prototype.logistic = function(z) {
  * Trains the classifier on a given training example.
  */
 Classifier.prototype.train = function(expectedValue, data) {
+
 };
 
 /*

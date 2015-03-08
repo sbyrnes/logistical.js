@@ -124,6 +124,13 @@ Classifier.prototype.generateRandomCoefficients = function(size) {
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
  */
 Classifier.prototype.calculateError = function(w, Y_exp, X) {
+  if(w == null || Y_exp == null || X == null)
+    throw new Error("Error: null input values");
+
+  if(w.dimensions().cols == 0 || Y_exp.dimensions.cols == 0 ||
+     X.dimensions().rows == 0 || X.dimensions().cols == 0)
+    throw new Error("Error: empty input values");
+
   var error = 0.0;
 
   return error;

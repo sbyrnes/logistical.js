@@ -352,6 +352,7 @@ describe('Logistical', function(){
     });
   });
 
+  /* Test generation of random coefficient vectors for starting point of descent */
   describe('#generateRandomCoefficients', function() {
     it('should not accept a negative value', function() {
       var w1 = subject.generateRandomCoefficients(-5);
@@ -374,6 +375,28 @@ describe('Logistical', function(){
       assert.equal(10, w2.dimensions().cols);
 
       assert.ok(!w1.eql(w2));
+    });
+  });
+
+  /* Test the calculation of error between the calculated and expected outcomes from a given input data set */
+  describe('#calculateError', function() {
+    it('should not null input values', function() {
+      assert.throws(function() {
+        subject.calculateError(null, null, null);
+      },
+        /null/
+      );
+
+    });
+    it('should not accept empty input values', function() {
+      assert.throws(function() {
+        var err = subject.calculateError(linear.Vector.create([]),
+                                         linear.Vector.create([]),
+                                         linear.Matrix.create([[]]));
+        },
+        /empty/
+      );
+
     });
   });
 

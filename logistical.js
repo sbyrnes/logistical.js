@@ -8,6 +8,7 @@
  */
 
 var LinearValidator = require('./lib/linear_support.js');
+var Linear = require('sylvester');
 
 /*
  * Main classifier entity.
@@ -62,6 +63,40 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
   }
 
   return sum;
+};
+
+/*
+ * Compute the gradient of the log likelihood
+ *
+ * Returns a vector of gradients with respect to the coefficients
+ *
+ */
+
+Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
+  LinearValidator.isVector(w);
+  LinearValidator.isArray(Y);
+  LinearValidator.isMatrix(X);
+
+  // Ensure the partial sum will not throw an error
+  LinearValidator.hasEqualElementCount(w, X.row(1));
+
+  var N = Y.length;
+  var K = w.cols();
+
+  var partialL = [];
+
+  for (var k = 0; k < K; k++) {
+    for (var i = 0; i < N; i++) {
+      partialL[k] += Y[i] * X.e(i+1, k) * this.logistic(-Y[i] * this.ZiPartialSum(w, X.row(i+1)));
+
+      // Account for regularization
+      if ( C > 0 ) {
+        partialL[k] += 0;
+      }
+    }
+  }
+
+  return Linear.Vector.create(partialL);
 };
 
 /*

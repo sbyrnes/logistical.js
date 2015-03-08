@@ -154,6 +154,7 @@ describe('Logistical', function(){
         assert.equal(-0.74175, subject.logLikelihood(w, Y, X, C).toFixed(5));
       });
     });
+
     describe('with regularization', function() {
       var C = 0.1;
 
@@ -191,6 +192,56 @@ describe('Logistical', function(){
         // from wolfrom alpha
         // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
         assert.equal(0.84175, subject.logLikelihood(w, Y, X, C).toFixed(5));
+      });
+    });
+  });
+
+  describe('#logLikelihoodGradient', function() {
+    describe('without regularization', function() {
+      var C = 0.0;
+
+      it('computes the logLikelihood gradient vector for a single dependent variable', function() {
+        var w = linear.Vector.create([1]);
+        var X = new linear.Matrix.create([[1],[3],[6]]);
+        var Y = [1,0,1];
+
+        var Z, logistic, sum, YX;
+        var partialLatK = [];
+        var expectedPartialL;
+
+        // Simple enough to calculate the vector components
+        Z = 1 * 1;
+        logistic = 1/(1 + Math.exp(-Z));
+        sum = Math.log(1 * logistic);
+        YX = 1 * 1;
+        partialLatK[0] = sum * YX;
+
+        Z = 1*3;
+        logistic = 1/(1 + Math.exp(-Z));
+        sum = Math.log(logistic);
+        YX = 0 * 3;
+        partialLatK[1] = sum * YX;
+
+        Z = 1*6;
+        logistic = 1/(1 + Math.exp(-Z));
+        sum = Math.log(logistic);
+        YX = 1 * 6;
+        partialLatK[2] = sum * YX;
+
+        expectedPartialL = linear.Vector.create([partialLatK[0], partialLatK[1], partialLatK[2]]);
+
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        fail();
+      });
+
+      it.skip('computes the logLikelihoodGradient for 2 dependent variables', function() {
+        var w = linear.Vector.create([1,1]);
+        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        var Y = [1,0,1];
+        // from wolfrom alpha
+        // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
+        assert.equal(-0.74175, subject.logLikelihoodGradient(w, Y, X, C).toFixed(5));
       });
     });
   });

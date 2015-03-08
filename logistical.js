@@ -8,6 +8,13 @@
  */
 
 var LinearValidator = require('./lib/linear_support.js');
+var Sylvester = require("sylvester");
+
+// Learning parameters
+var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
+var ALPHA = 0.0005;       // learning rate, should be small
+var BETA = 0.0007;        // regularization factor, should be small
+var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
 
 /*
  * Main classifier entity.
@@ -65,6 +72,52 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
 };
 
 /*
+ * Randomly generates a vector of coefficients of the specified size.
+ */
+Classifier.prototype.generateRandomCoefficients = function(size) {
+  if(size < 1) return null;
+
+  return Sylvester.Vector.Random(size);
+}
+
+/*
+ * Calculates the error of the provided model as applied to the input data and expected outcomes.
+ */
+Classifier.prototype.calculateError = function(Y_exp, X) {
+
+  // Validate input
+  if(Y_exp == null || X == null)
+    throw new Error("Error: null input values");
+
+  if(Y_exp.dimensions().cols == 0 ||
+     X.dimensions().rows == 0 ||
+     X.dimensions().cols == 0)
+    throw new Error("Error: empty input values");
+
+  if(Y_exp.dimensions().cols != X.dimensions().rows)
+    throw new Error("Error: mismatching input dimensions");
+
+  // classify each and compare
+  var errorCount = 0;
+  for(var row = 1; row <= X.dimensions().rows; row++)
+  {
+    var Y_calc = this.classify(X.row(row));
+
+    debugger;
+
+    if(Y_calc != Y_exp.e(row))
+    {
+      errorCount++;
+    }
+  }
+
+  // Error is the percentage of misclassifications
+  var error = errorCount / X.dimensions().rows;
+
+  return error;
+};
+
+/*
  * Computes the logistic function value for a given input.
  */
 Classifier.prototype.logistic = function(z) {
@@ -75,6 +128,7 @@ Classifier.prototype.logistic = function(z) {
  * Trains the classifier on a given training example.
  */
 Classifier.prototype.train = function(expectedValue, data) {
+
 };
 
 /*

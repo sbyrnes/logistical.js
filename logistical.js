@@ -113,17 +113,27 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
 
 /*
  * Randomly generates a vector of coefficients of the specified size.
+ *
+ * size - the size of the vector to generate of minimum size 1
+ *
+ * returns a vector of random coefficient values
  */
 Classifier.prototype.generateRandomCoefficients = function(size) {
-  if(size < 1) return null;
+  if(size < 1)
+    throw new Error("Error: Size must be greater than zero")
 
   return Linear.Vector.Random(size);
 }
 
 /*
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
+ *
+ * X - Input data
+ * Y_exp - Expected outcomes where Y_exp[i] is the expected outcome of row i of X
+ *
+ * returns numeric value of error
  */
-Classifier.prototype.calculateError = function(Y_exp, X) {
+Classifier.prototype.calculateError = function(X, Y_exp) {
 
   // Validate input
   if(Y_exp == null || X == null)
@@ -142,8 +152,6 @@ Classifier.prototype.calculateError = function(Y_exp, X) {
   for(var row = 1; row <= X.dimensions().rows; row++)
   {
     var Y_calc = this.classify(X.row(row));
-
-    debugger;
 
     if(Y_calc != Y_exp.e(row))
     {

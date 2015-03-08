@@ -355,14 +355,14 @@ describe('Logistical', function(){
   /* Test generation of random coefficient vectors for starting point of descent */
   describe('#generateRandomCoefficients', function() {
     it('should not accept a negative value', function() {
-      var w1 = subject.generateRandomCoefficients(-5);
-
-      assert.ok(!w1);
+      assert.throws(function() {
+        subject.generateRandomCoefficients(-5);
+      })
     });
     it('should not accept a zero value', function() {
-      var w1 = subject.generateRandomCoefficients(0);
-
-      assert.ok(!w1);
+      assert.throws(function() {
+        subject.generateRandomCoefficients(0);
+      })
     });
     it('should generate a different matrix every time', function() {
       var w1 = subject.generateRandomCoefficients(10);
@@ -408,8 +408,7 @@ describe('Logistical', function(){
       var Y_exp = linear.Vector.create([0, 1, 0, 1, 0]);
       var X = linear.Matrix.Zero(5, 2);
 
-      var err = subject.calculateError(Y_exp,
-                                       X);
+      var err = subject.calculateError(X, Y_exp);
 
       assert.equal(0.6, err);
 

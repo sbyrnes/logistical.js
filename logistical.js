@@ -123,15 +123,36 @@ Classifier.prototype.generateRandomCoefficients = function(size) {
 /*
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
  */
-Classifier.prototype.calculateError = function(w, Y_exp, X) {
-  if(w == null || Y_exp == null || X == null)
+Classifier.prototype.calculateError = function(Y_exp, X) {
+
+  // Validate input
+  if(Y_exp == null || X == null)
     throw new Error("Error: null input values");
 
-  if(w.dimensions().cols == 0 || Y_exp.dimensions.cols == 0 ||
-     X.dimensions().rows == 0 || X.dimensions().cols == 0)
+  if(Y_exp.dimensions().cols == 0 ||
+     X.dimensions().rows == 0 ||
+     X.dimensions().cols == 0)
     throw new Error("Error: empty input values");
 
-  var error = 0.0;
+  if(Y_exp.dimensions().cols != X.dimensions().rows)
+    throw new Error("Error: mismatching input dimensions");
+
+  // classify each and compare
+  var errorCount = 0;
+  for(var row = 1; row <= X.dimensions().rows; row++)
+  {
+    var Y_calc = this.classify(X.row(row));
+
+    debugger;
+
+    if(Y_calc != Y_exp.e(row))
+    {
+      errorCount++;
+    }
+  }
+
+  // Error is the percentage of misclassifications
+  var error = errorCount / X.dimensions().rows;
 
   return error;
 };

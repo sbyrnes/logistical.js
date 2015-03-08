@@ -382,20 +382,36 @@ describe('Logistical', function(){
   describe('#calculateError', function() {
     it('should not null input values', function() {
       assert.throws(function() {
-        subject.calculateError(null, null, null);
+        subject.calculateError(null, null);
       },
         /null/
       );
-
     });
     it('should not accept empty input values', function() {
       assert.throws(function() {
         var err = subject.calculateError(linear.Vector.create([]),
-                                         linear.Vector.create([]),
                                          linear.Matrix.create([[]]));
         },
         /empty/
       );
+    });
+    it('should not accept mismatched dimensions', function() {
+      assert.throws(function() {
+        var err = subject.calculateError(linear.Vector.Zero(5),
+                                         linear.Matrix.Zero(6, 5));
+        },
+        /dimensions/
+      );
+    });
+    it('should calculate the correct error', function() {
+      // test inputs
+      var Y_exp = linear.Vector.create([0, 1, 0, 1, 0]);
+      var X = linear.Matrix.Zero(5, 2);
+
+      var err = subject.calculateError(Y_exp,
+                                       X);
+
+      assert.equal(0.6, err);
 
     });
   });

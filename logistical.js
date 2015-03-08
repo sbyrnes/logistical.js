@@ -68,10 +68,13 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
 /*
  * Compute the gradient of the log likelihood
  *
- * Returns a vector of gradients with respect to the coefficients
+ * w = Vector coefficients
+ * Y = array of labels for the data (Y1, Y2, ..., Yn)
+ * X = Matrix of training data vecors (X1, X2, ..., Xn)
+ * C = Regularization constant
  *
+ * Returns a vector of gradients with respect to the coefficients
  */
-
 Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   LinearValidator.isVector(w);
   LinearValidator.isArray(Y);
@@ -86,14 +89,18 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   var partialL = [];
 
   for (var k = 0; k < K; k++) {
-    for (var i = 0; i < N; i++) {
-      partialL[k] += Y[i] * X.e(i+1, k) * this.logistic(-Y[i] * this.ZiPartialSum(w, X.row(i+1)));
+    var sum = 0.0;
 
-      // Account for regularization
-      if ( C > 0 ) {
-        partialL[k] += 0;
-      }
+    for (var i = 0; i < N; i++) {
+      sum += Y[i] * X.e(i+1, k+1) * this.logistic(-Y[i] * this.ZiPartialSum(w, X.row(i+1)));
     }
+
+    // Account for regularization
+    if ( C > 0 ) {
+      sum = -sum + C * w.e(k+1);
+    }
+
+    partialL[k] = sum;
   }
 
   return Linear.Vector.create(partialL);

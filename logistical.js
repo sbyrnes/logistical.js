@@ -139,17 +139,17 @@ Classifier.prototype.calculateError = function(X, Y_exp) {
   if(Y_exp == null || X == null)
     throw new Error("Error: null input values");
 
-  if(Y_exp.dimensions().cols == 0 ||
+  if(Y_exp.cols() == 0 ||
      X.dimensions().rows == 0 ||
      X.dimensions().cols == 0)
     throw new Error("Error: empty input values");
 
-  if(Y_exp.dimensions().cols != X.dimensions().rows)
+  if(Y_exp.cols() != X.rows())
     throw new Error("Error: mismatching input dimensions");
 
   // classify each and compare
   var errorCount = 0;
-  for(var row = 1; row <= X.dimensions().rows; row++)
+  for(var row = 1; row <= X.rows(); row++)
   {
     var Y_calc = this.classify(X.row(row));
 

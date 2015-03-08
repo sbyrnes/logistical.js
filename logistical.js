@@ -113,38 +113,27 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
 
 /*
  * Randomly generates a vector of coefficients of the specified size.
- *
- * size - the size of the vector to generate of minimum size 1
- *
- * returns a vector of random coefficient values
  */
 Classifier.prototype.generateRandomCoefficients = function(size) {
-  if(size < 1)
-    throw new Error("Error: Size must be greater than zero")
+  if(size < 1) return null;
 
   return Linear.Vector.Random(size);
 }
 
 /*
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
- *
- * X - Input data
- * Y_exp - Expected outcomes where Y_exp[i] is the expected outcome of row i of X
- *
- * returns numeric value of error
  */
-Classifier.prototype.calculateError = function(X, Y_exp) {
+Classifier.prototype.calculateError = function(Y_exp, X) {
 
   // Validate input
   if(Y_exp == null || X == null)
     throw new Error("Error: null input values");
 
-  if(Y_exp.cols() == 0 ||
-     X.dimensions().rows == 0 ||
-     X.dimensions().cols == 0)
+  if(LinearValidator.isEmpty(Y_exp) ||
+     LinearValidator.isEmpty(X))
     throw new Error("Error: empty input values");
 
-  if(Y_exp.cols() != X.rows())
+  if(!LinearValidator.isMatching(Y_exp, X))
     throw new Error("Error: mismatching input dimensions");
 
   // classify each and compare
@@ -152,6 +141,8 @@ Classifier.prototype.calculateError = function(X, Y_exp) {
   for(var row = 1; row <= X.rows(); row++)
   {
     var Y_calc = this.classify(X.row(row));
+
+    debugger;
 
     if(Y_calc != Y_exp.e(row))
     {

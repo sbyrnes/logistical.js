@@ -1,2 +1,2 @@
 #!/bin/bash
-./node_modules/mocha/bin/mocha
+./node_modules/mocha/bin/mocha $1

@@ -154,6 +154,7 @@ describe('Logistical', function(){
         assert.equal(-0.74175, subject.logLikelihood(w, Y, X, C).toFixed(5));
       });
     });
+
     describe('with regularization', function() {
       var C = 0.1;
 
@@ -191,6 +192,125 @@ describe('Logistical', function(){
         // from wolfrom alpha
         // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
         assert.equal(0.84175, subject.logLikelihood(w, Y, X, C).toFixed(5));
+      });
+    });
+  });
+
+  describe('#logLikelihoodGradient', function() {
+    var g = function(Y, Z) {
+      return subject.logistic(-Y * Z);
+    };
+
+    describe('without regularization', function() {
+      var C = 0.0;
+
+      it('computes the logLikelihood gradient vector for a single dependent variable', function() {
+        var w = linear.Vector.create([1]);
+        var X = new linear.Matrix.create([[1],[3],[6]]);
+        var Y = [1,0,1];
+
+        var partialLatK = [0];
+
+        // Simple enough to calculate the vector components
+        var Z1 = 1 * 1;
+        var Z2 = 1 * 3;
+        var Z3 = 1 * 6;
+
+        partialLatK[0] += 1 * 1 * g(1, Z1);
+        partialLatK[0] += 0 * 3 * g(0, Z2);
+        partialLatK[0] += 1 * 6 * g(1, Z3);
+
+        var expectedPartialL = linear.Vector.create(partialLatK);
+
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+      });
+
+      it('computes the logLikelihoodGradient for 2 dependent variables', function() {
+        var w = linear.Vector.create([1,1]);
+        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        var Y = [1,0,1];
+
+        var partialLatK = [0,0];
+
+        // Simple enough to calculate the vector components
+        var Z1 = 1 * 1 + 1 * 2;
+        var Z2 = 1 * 3 + 1 * 4;
+        var Z3 = 1 * 5 + 1 * 6;
+
+        partialLatK[0] += 1 * 1 * g(1, Z1);
+        partialLatK[0] += 0 * 3 * g(0, Z2);
+        partialLatK[0] += 1 * 5 * g(1, Z3);
+
+        partialLatK[1] += 1 * 2 * g(1, Z1);
+        partialLatK[1] += 0 * 4 * g(0, Z2);
+        partialLatK[1] += 1 * 6 * g(1, Z3);
+
+        expectedPartialL = linear.Vector.create(partialLatK);
+
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+        assert.equal(expectedPartialL.e(2).toFixed(5), calculatedPartialL.e(2).toFixed(5));
+      });
+    });
+
+    describe('WITH regularization', function() {
+      var C = 1.0;
+
+      it('computes the logLikelihood gradient vector for a single dependent variable', function() {
+        var w = linear.Vector.create([1]);
+        var X = new linear.Matrix.create([[1],[3],[6]]);
+        var Y = [1,0,1];
+
+        var partialLatK = [0];
+
+        // Simple enough to calculate the vector components
+        var Z1 = 1 * 1;
+        var Z2 = 1 * 3;
+        var Z3 = 1 * 6;
+
+        partialLatK[0] -= 1 * 1 * g(1, Z1);
+        partialLatK[0] -= 0 * 3 * g(0, Z2);
+        partialLatK[0] -= 1 * 6 * g(1, Z3);
+        partialLatK[0] += C * 1;
+
+        var expectedPartialL = linear.Vector.create(partialLatK);
+
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+      });
+
+      it('computes the logLikelihoodGradient for 2 dependent variables', function() {
+        var w = linear.Vector.create([1,1]);
+        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        var Y = [1,0,1];
+
+        var partialLatK = [0,0];
+
+        // Simple enough to calculate the vector components
+        var Z1 = 1 * 1 + 1 * 2;
+        var Z2 = 1 * 3 + 1 * 4;
+        var Z3 = 1 * 5 + 1 * 6;
+
+        partialLatK[0] -= 1 * 1 * g(1, Z1);
+        partialLatK[0] -= 0 * 3 * g(0, Z2);
+        partialLatK[0] -= 1 * 5 * g(1, Z3);
+        partialLatK[0] += C * 1;
+
+        partialLatK[1] -= 1 * 2 * g(1, Z1);
+        partialLatK[1] -= 0 * 4 * g(0, Z2);
+        partialLatK[1] -= 1 * 6 * g(1, Z3);
+        partialLatK[1] += C * 1;
+
+        expectedPartialL = linear.Vector.create(partialLatK);
+
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+        assert.equal(expectedPartialL.e(2).toFixed(5), calculatedPartialL.e(2).toFixed(5));
       });
     });
   });

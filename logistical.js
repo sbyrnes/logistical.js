@@ -12,7 +12,9 @@ var LinearValidator = require('./lib/linear_support.js');
 /*
  * Main classifier entity.
  */
-var Classifier = function() { };
+var Classifier = function() {
+  this.coefficientModel = [];
+ };
 
 /*
  * Intermediate function for calculating the partial sum for the likelihood
@@ -78,10 +80,20 @@ Classifier.prototype.train = function(expectedValue, data) {
 };
 
 /*
+ * Predicts the probability of the specified value for the given data.
+ */
+Classifier.prototype.predict = function(w, data) {
+  return this.logistic(w.dot(data));
+}
+
+/*
  * Classifies the provided example.
  */
-Classifier.prototype.classify = function(data) {
-  return 1;
+Classifier.prototype.classify = function(w, data) {
+  var prediction = this.predict(w, data);
+
+  // if the prediction is over 1/2, classify as 1 otherwise 0
+  return (prediction > 0.5);
 };
 
 module.exports = Classifier;

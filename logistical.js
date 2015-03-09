@@ -140,14 +140,10 @@ Classifier.prototype.calculateError = function(X, Y_exp) {
 
   // classify each and compare
   var errorCount = 0;
-  for(var row = 1; row <= X.rows(); row++)
-  {
+  for(var row = 1; row <= X.rows(); row++) {
     var Y_calc = this.classify(X.row(row));
 
-    debugger;
-
-    if(Y_calc != Y_exp.e(row))
-    {
+    if(Y_calc != Y_exp.e(row)) {
       errorCount++;
     }
   }

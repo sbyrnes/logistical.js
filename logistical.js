@@ -8,7 +8,13 @@
  */
 
 var LinearValidator = require('./lib/linear_support.js');
-var Linear = require('sylvester');
+var Linear = require('Sylvester');
+
+// Learning parameters
+var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
+var ALPHA = 0.0005;       // learning rate, should be small
+var BETA = 0.0007;        // regularization factor, should be small
+var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
 
 /*
  * Main classifier entity.
@@ -22,7 +28,7 @@ var Classifier = function() { };
  * Xi = vector of training data with k elements
  */
 Classifier.prototype.ZiPartialSum = function(w, Xi) {
-  LinearValidator.isVector(w, Xi);
+  LinearValidator.assertVector(w, Xi);
   LinearValidator.hasEqualElementCount(w, Xi);
 
   var sum = w.dot(Xi);
@@ -42,9 +48,9 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * C = Regularization constant
  */
 Classifier.prototype.logLikelihood = function(w, Y, X, C) {
-  LinearValidator.isVector(w);
-  LinearValidator.isArray(Y);
-  LinearValidator.isMatrix(X);
+  LinearValidator.assertVector(w);
+  LinearValidator.assertArray(Y);
+  LinearValidator.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
   LinearValidator.hasEqualElementCount(w, X.row(1));
@@ -76,9 +82,9 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
  * Returns a vector of gradients with respect to the coefficients
  */
 Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
-  LinearValidator.isVector(w);
-  LinearValidator.isArray(Y);
-  LinearValidator.isMatrix(X);
+  LinearValidator.assertVector(w);
+  LinearValidator.assertArray(Y);
+  LinearValidator.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
   LinearValidator.hasEqualElementCount(w, X.row(1));
@@ -104,6 +110,48 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   }
 
   return Linear.Vector.create(partialL);
+}
+
+/*
+ * Randomly generates a vector of coefficients of the specified size.
+ */
+Classifier.prototype.generateRandomCoefficients = function(size) {
+  if(size < 1)
+    throw Error("Error: size must be at least one");
+
+  return Linear.Vector.Random(size);
+}
+
+/*
+ * Calculates the error of the provided model as applied to the input data and expected outcomes.
+ */
+Classifier.prototype.calculateError = function(X, Y_exp) {
+
+  // Validate input
+  if(Y_exp == null || X == null)
+    throw new Error("Error: null input values");
+
+  if(LinearValidator.isEmpty(Y_exp) ||
+     LinearValidator.isEmpty(X))
+    throw new Error("Error: empty input values");
+
+  if(!LinearValidator.isMatching(Y_exp, X))
+    throw new Error("Error: mismatching input dimensions");
+
+  // classify each and compare
+  var errorCount = 0;
+  for(var row = 1; row <= X.rows(); row++) {
+    var Y_calc = this.classify(X.row(row));
+
+    if(Y_calc != Y_exp.e(row)) {
+      errorCount++;
+    }
+  }
+
+  // Error is the percentage of misclassifications
+  var error = errorCount / X.dimensions().rows;
+
+  return error;
 };
 
 /*
@@ -117,6 +165,7 @@ Classifier.prototype.logistic = function(z) {
  * Trains the classifier on a given training example.
  */
 Classifier.prototype.train = function(expectedValue, data) {
+
 };
 
 /*

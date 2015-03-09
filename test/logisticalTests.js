@@ -12,7 +12,7 @@ var fs = require("fs");
 var parse = require("csv-parse");
 var assert = require("assert");
 var async = require("async");
-var linear = require("sylvester");
+var linear = require("Sylvester");
 
 // module under test
 var Classifier = require("../logistical.js");
@@ -351,6 +351,70 @@ describe('Logistical', function(){
       }
     });
   });
+
+  /* Test generation of random coefficient vectors for starting point of descent */
+  describe('#generateRandomCoefficients', function() {
+    it('should not accept a negative value', function() {
+      assert.throws(function() {
+        subject.generateRandomCoefficients(-5);
+      })
+    });
+    it('should not accept a zero value', function() {
+      assert.throws(function() {
+        subject.generateRandomCoefficients(0);
+      })
+    });
+    it('should generate a different matrix every time', function() {
+      var w1 = subject.generateRandomCoefficients(10);
+      var w2 = subject.generateRandomCoefficients(10);
+
+      assert.ok(w1);
+      assert.ok(w2);
+
+      assert.equal(10, w1.dimensions().cols);
+      assert.equal(10, w2.dimensions().cols);
+
+      assert.ok(!w1.eql(w2));
+    });
+  });
+
+  /* Test the calculation of error between the calculated and expected outcomes from a given input data set */
+  describe('#calculateError', function() {
+    it('should not null input values', function() {
+      assert.throws(function() {
+        subject.calculateError(null, null);
+      },
+        /null/
+      );
+    });
+    it('should not accept empty input values', function() {
+      assert.throws(function() {
+        var err = subject.calculateError(linear.Vector.create([]),
+                                         linear.Matrix.create([[]]));
+        },
+        /empty/
+      );
+    });
+    it('should not accept mismatched dimensions', function() {
+      assert.throws(function() {
+        var err = subject.calculateError(linear.Vector.Zero(5),
+                                         linear.Matrix.Zero(6, 5));
+        },
+        /dimensions/
+      );
+    });
+    it('should calculate the correct error', function() {
+      // test inputs
+      var Y_exp = linear.Vector.create([0, 1, 0, 1, 0]);
+      var X = linear.Matrix.Zero(5, 2);
+
+      var err = subject.calculateError(X, Y_exp);
+
+      assert.equal(0.6, err);
+
+    });
+  });
+
 });
 
 /* Reads and parses a CSV file */

@@ -28,7 +28,7 @@ var Classifier = function() { };
  * Xi = vector of training data with k elements
  */
 Classifier.prototype.ZiPartialSum = function(w, Xi) {
-  LinearValidator.isVector(w, Xi);
+  LinearValidator.assertVector(w, Xi);
   LinearValidator.hasEqualElementCount(w, Xi);
 
   var sum = w.dot(Xi);
@@ -48,9 +48,9 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * C = Regularization constant
  */
 Classifier.prototype.logLikelihood = function(w, Y, X, C) {
-  LinearValidator.isVector(w);
-  LinearValidator.isArray(Y);
-  LinearValidator.isMatrix(X);
+  LinearValidator.assertVector(w);
+  LinearValidator.assertArray(Y);
+  LinearValidator.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
   LinearValidator.hasEqualElementCount(w, X.row(1));
@@ -82,9 +82,9 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
  * Returns a vector of gradients with respect to the coefficients
  */
 Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
-  LinearValidator.isVector(w);
-  LinearValidator.isArray(Y);
-  LinearValidator.isMatrix(X);
+  LinearValidator.assertVector(w);
+  LinearValidator.assertArray(Y);
+  LinearValidator.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
   LinearValidator.hasEqualElementCount(w, X.row(1));
@@ -110,12 +110,14 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   }
 
   return Linear.Vector.create(partialL);
+}
 
 /*
  * Randomly generates a vector of coefficients of the specified size.
  */
 Classifier.prototype.generateRandomCoefficients = function(size) {
-  if(size < 1) return null;
+  if(size < 1)
+    throw Error("Error: size must be at least one");
 
   return Linear.Vector.Random(size);
 }
@@ -123,7 +125,7 @@ Classifier.prototype.generateRandomCoefficients = function(size) {
 /*
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
  */
-Classifier.prototype.calculateError = function(Y_exp, X) {
+Classifier.prototype.calculateError = function(X, Y_exp) {
 
   // Validate input
   if(Y_exp == null || X == null)

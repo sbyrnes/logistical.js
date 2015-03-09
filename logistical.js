@@ -170,12 +170,6 @@ Classifier.prototype.logistic = function(z) {
   return 1.0 / (1.0 + Math.exp(-z));
 };
 
-/*
- * Trains the classifier on a given training example.
- */
-Classifier.prototype.train = function(expectedValue, data) {
-
-};
 
 /*
  * Predicts the probability of the specified value for the given data.
@@ -185,6 +179,26 @@ Classifier.prototype.train = function(expectedValue, data) {
  */
 Classifier.prototype.predict = function(w, data) {
   return this.logistic(w.dot(data));
+};
+
+/*
+ * Trains the classifier on a given training example.
+ */
+Classifier.prototype.train = function(expectedValue, data) {
+  // 1. Generate a random coefficient matrix
+  // var w = this.generateCoefficients()
+
+  // 2. Loop for N steps in the descent
+  // 2a. Calculate the gradients for w
+  //    gradient = this.loglikelihoodGradient()
+  // 2b. Adjust w
+  //    w += gradient;
+  // 2c. Check error and end if below threshold
+  //    err = this.calculateError()
+  // Repeat
+
+  // 3. Cross validation
+  // this.calculateError()
 };
 
 /*

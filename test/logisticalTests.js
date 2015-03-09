@@ -316,10 +316,31 @@ describe('Logistical', function(){
   });
 
   /* Test classification of a value based on some training data */
-  describe.skip('#classify', function() {
+  describe('#classify', function() {
     var i;
 
-    it('correctly classifies small test data', function() {
+    it('correctly classifies fixed model (without training)', function() {
+      // Create test data and coefficients who dot product P satisfies logistic(P) > 0.5
+      // which should classify as 1
+      var test = linear.Vector.create([1, 1, 1, 1]);
+      var coefficients = linear.Vector.create([1, 1, 1, 1]);
+
+      assert.equal(1, subject.classify(coefficients, test));
+
+      test = linear.Vector.create([0.1, 0.1, 0.1, 0.1]);
+      coefficients = linear.Vector.create([0.1, 0.1, 0.1, 0.1]);
+
+      assert.equal(1, subject.classify(coefficients, test));
+
+      // Create test data and coefficients who dot product P satisfies logistic(P) < 0.5
+      // which should classify as 0
+      test = linear.Vector.create([-1, -1, -1, -1]);
+      coefficients = linear.Vector.create([1, 1, 1, 1]);
+
+      assert.equal(0, subject.classify(coefficients, test));
+    });
+
+    it.skip('correctly classifies small test data', function() {
       // Train the classifier
       for(i = 0; i < small.training.length; i++) {
         subject.train(small.training[i][small.resultIndex],
@@ -335,7 +356,7 @@ describe('Logistical', function(){
       }
     });
 
-    it('correctly classifies large test data', function(){
+    it.skip('correctly classifies large test data', function(){
       // Train the classifier
       for(i = 0; i < large.training.length; i++) {
         subject.train(large.training[i][large.resultIndex],

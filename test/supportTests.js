@@ -12,7 +12,7 @@
 var assert = require("assert");
 var linear = require("Sylvester");
 
-var support = require('../lib/linear_support.js');
+var support = require('../lib/support.js');
 
 describe('support', function() {
 });

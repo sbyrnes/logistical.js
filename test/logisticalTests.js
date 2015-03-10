@@ -275,7 +275,7 @@ describe('Logistical', function(){
     });
   });
 
-  describe('#logLikelihoodGradient', function() {
+  describe.only('#logLikelihoodGradient', function() {
     var g = function(Y, Z) {
       return subject.logistic(-Y * Z);
     };
@@ -285,8 +285,8 @@ describe('Logistical', function(){
 
       it('computes the logLikelihood gradient vector for a single dependent variable', function() {
         var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
+        var X = linear.Matrix.create([[1],[3],[6]]);
+        var Y = linear.Vector.create([1,0,1]);
 
         var partialLatK = [0];
 
@@ -300,7 +300,6 @@ describe('Logistical', function(){
         partialLatK[0] += 1 * 6 * g(1, Z3);
 
         var expectedPartialL = linear.Vector.create(partialLatK);
-
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
         assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
@@ -308,8 +307,8 @@ describe('Logistical', function(){
 
       it('computes the logLikelihoodGradient for 2 dependent variables', function() {
         var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
+        var X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        var Y = linear.Vector.create([1,0,1]);
 
         var partialLatK = [0,0];
 
@@ -340,8 +339,8 @@ describe('Logistical', function(){
 
       it('computes the logLikelihood gradient vector for a single dependent variable', function() {
         var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
+        var X = linear.Matrix.create([[1],[3],[6]]);
+        var Y = linear.Vector.create([1,0,1]);
 
         var partialLatK = [0];
 
@@ -364,8 +363,8 @@ describe('Logistical', function(){
 
       it('computes the logLikelihoodGradient for 2 dependent variables', function() {
         var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
+        var X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        var Y = linear.Vector.create([1,0,1]);
 
         var partialLatK = [0,0];
 

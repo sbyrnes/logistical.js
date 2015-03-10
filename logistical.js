@@ -7,7 +7,7 @@
  * Made available via the MIT License, text included in LICENSE.
  */
 
-var Support = require('./lib/linear_support.js');
+var Support = require('./lib/support.js');
 var Linear = require('Sylvester');
 
 // Learning parameters
@@ -92,22 +92,23 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
  */
 Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
   Support.validateVector(w);
-  Support.validateArray(Y);
+  Support.validateVector(Y);
   Support.validateMatrix(X);
 
   // Ensure the partial sum will not throw an error
   Support.hasEqualElementCount(w, X.row(1));
 
-  var N = Y.length;
   var K = w.cols();
+  var N = Y.cols();
 
-  var partialL = [];
+  var partialLatW = [];
 
   for (var k = 0; k < K; k++) {
     var sum = 0.0;
 
-    for (var i = 0; i < N; i++) {
-      sum += Y[i] * X.e(i+1, k+1) * this.logistic(-Y[i] * this.ZiPartialSum(w, X.row(i+1)));
+    for (var i = 1; i <= N; i++) {
+      sum += Y.e(i) * X.e(i, k+1) * this.logistic(-Y.e(i) * this.ZiPartialSum(w, X.row(i)));
+      debugger
     }
 
     // Account for regularization
@@ -115,10 +116,10 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
       sum = -sum + C * w.e(k+1);
     }
 
-    partialL[k] = sum;
+    partialLatW[k] = sum;
   }
 
-  return Linear.Vector.create(partialL);
+  return Linear.Vector.create(partialLatW);
 };
 
 /*

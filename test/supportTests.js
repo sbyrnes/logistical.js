@@ -178,6 +178,12 @@ describe('support', function() {
         linear.Vector.create([1,2,3]),
         linear.Matrix.create([[1,2],[3,4]]),
       ];
+
+      numeric = [
+        1234,
+        8.4,
+        -1.23,
+      ];
     });
 
     describe('#isNumeric', function() {
@@ -189,8 +195,10 @@ describe('support', function() {
       });
 
       it('returns true for numeric', function() {
-        result = support.isNumeric(1234);
-        assert.equal(true, result);
+        for (var i = 0, l = numeric.length; i < l; i++) {
+          result = support.isNumeric(numeric[i]);
+          assert.equal(true, result);
+        }
       });
     });
 
@@ -207,8 +215,7 @@ describe('support', function() {
 
       it('does not throw error for numeric', function() {
          assert.doesNotThrow(function() {
-            debugger
-             support.assertNumeric(1234, 7.345);
+             support.assertNumeric(numeric[0], numeric[1], numeric[2]);
            },
            /Error/
          );
@@ -254,6 +261,62 @@ describe('support', function() {
       it('does throw error for null', function() {
          assert.doesNotThrow(function() {
              support.assertNull(['asdf', null]);
+           },
+           /Error/
+         );
+      });
+    });
+  });
+
+  describe.only('Empty', function() {
+    var empty;
+
+    beforeEach(function() {
+      test = [
+        [1,2,3],
+        linear.Vector.create([1,2,3]),
+        linear.Matrix.create([[1,2],[3,4]]),
+      ];
+
+      empty = [
+        [],
+        linear.Vector.create([]),
+        linear.Matrix.create([[null]]),
+      ];
+    });
+
+
+    describe('#isEmpty', function() {
+      it('returns false for non-empty', function() {
+        for (var i = 0; i < test.length; i++) {
+          result = support.isEmpty(test[i]);
+          assert.equal(false, result);
+        }
+      });
+
+      it('returns true for empty', function() {
+        for (var i = 0; i < test.length; i++) {
+          result = support.isEmpty(empty[i]);
+          debugger
+          assert.equal(true, result);
+        }
+      });
+    });
+
+    describe.skip('#assertEmpty', function() {
+      it('does not throws error for non-empty', function() {
+        for (var i = 0; i < test.length; i++) {
+          assert.doesNotThrow(function() {
+              support.assertEmpty(test[i]);
+            },
+            /Error/
+          );
+        }
+      });
+
+      it('does throw error for empty', function() {
+         assert.doesNotThrow(function() {
+             support.assertEmpty(['asdf', null]);
            },
            /Error/
          );

@@ -1,5 +1,6 @@
 /* logistical.js
- * A logistical regression classifier for Node.js
+ *
+ * Tests for the logistical.js library
  *
  * Authors: Wes Bailey @baywes, Sean Byrnes @sbyrnes
  * Copyright 2015
@@ -38,7 +39,7 @@ describe('Logistical', function(){
       small.resultIndex = 2;     // Index of the result value in the training sets
 
   /* Tasks to complete before running any tests */
-  before(function(done){
+  before(function(done) {
 
     async.series([
       function(nextStep) {
@@ -76,6 +77,22 @@ describe('Logistical', function(){
 
   /* Test computation of the logistic function */
   describe('#logistic', function() {
+    it('does not allow null input', function() {
+      assert.throws(function() {
+        subject.logistic(null);
+      },
+      /numeric/
+      );
+    });
+
+    it('does not allow non-numeric input', function() {
+      assert.throws(function() {
+        subject.logistic('asdf');
+      },
+      /numeric/
+      );
+    });
+
     it(' validates function works for known values', function(){
       // expected values found using Wolfram Alpha:
       // (http://www.wolframalpha.com/input/?i=logistic+sigmoid+%280.75%29)
@@ -96,15 +113,41 @@ describe('Logistical', function(){
     });
 
     it('tests arguments for the correct type', function() {
-      assert.doesNotThrow( function() { subject.ZiPartialSum(w, X.row(1)); }, TypeError );
-      assert.throws( function() { subject.ZiPartialSum(2, 'bad'); }, TypeError);
+      assert.doesNotThrow( function() {
+          subject.ZiPartialSum(w, X.row(1));
+        }
+      );
+    });
+
+    it('does not allow null input', function() {
+      assert.throws( function() {
+          subject.ZiPartialSum(null, null);
+        }
+      );
+    });
+
+    it('does not allow non-numeric input', function() {
+      assert.throws( function() {
+          subject.ZiPartialSum(2, 'bad');
+        },
+        TypeError
+      );
     });
 
     it('tests that the vectors have the same number of elements', function() {
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
-      assert.doesNotThrow( function() { subject.ZiPartialSum(w, X.row(1)); }, Error );
-      assert.throws( function() {subject.ZiPartialSum(w. Z.row(1)); }, Error);
+      assert.doesNotThrow( function() {
+          subject.ZiPartialSum(w, X.row(1));
+        },
+        Error
+      );
+
+      assert.throws( function() {
+          subject.ZiPartialSum(w. Z.row(1));
+        },
+        Error
+      );
     });
 
     it('calculates the proper sum', function() {
@@ -115,197 +158,198 @@ describe('Logistical', function(){
   });
 
   describe('#logLikelihood', function() {
-    describe('without regularization', function() {
-      var C = 0.0;
+    var w, X, Y, LatW;
 
-      it('computes the logLikelihood for a single dependent variable', function() {
-        var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
+    var g = function(Y, Z) {
+      return subject.logistic(Y * Z);
+    };
 
-        /*
-         * Simple enough to outline the component steps
-         *
-         * Z[0] = 1*1
-         * logistic[0] = 1/(1 + exp(-1*1))
-         * sum[0] = log(1 * 1/(1 + exp(-1*1)))
-         *
-         * Z[1] = 1*3
-         * logistic[1] = 1/(1 + exp(-3*0))
-         * sum[1] = log(1/(1 + exp(-3*0)))
-         *
-         * Z[2] = 1*6
-         * logistic[2] = 1/(1 + exp(-1*6))
-         * sum[2] = log(1/(1 + exp(-1*6)))
-         *
-         * L(w) = sum[0] + sum[1] + sum[2]
-         */
-        // from wolfrom alpha
-        // http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
-        assert.equal(-1.00888, subject.logLikelihood(w, Y, X, C).toFixed(5));
+    describe('single dependent variable', function() {
+      beforeEach(function() {
+        w = linear.Vector.create([1]);
+        X = linear.Matrix.create([[1],[3],[6]]);
+        Y = linear.Vector.create([1,0,1]);
+
+        Z = [1 * 1, 1 * 3, 1 * 6];
+        LatW = 0.0;
+
+        for ( var i = 0; i < 3; i++ ) {
+          LatW += Math.log( g(Y.e(i+1), Z[i]) );
+        }
       });
 
-      it('computes the logLikelihood for 2 dependent variables', function() {
-        var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
-        // from wolfrom alpha
-        // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-        assert.equal(-0.74175, subject.logLikelihood(w, Y, X, C).toFixed(5));
+      /*
+       * Outlining the math steps we have
+       *
+       * Z[i] = sum[k]{w[k] * x[i][k]}
+       *
+       * g[i] = logistic(Y[i] * Z[i])
+       *
+       * L[w] = -sum[i]{log(g(Y[i],Z[i])}
+       *
+       * For our example data we have the following for the first term:
+       *
+       * Z[1] = 1 * 1
+       * g[1] = logistic(Y[1] * Z[1])
+       * L[w] = log(g(Y[1], Z[1]))
+       *
+       */
+      it('without regularization', function() {
+        var C = 0.0;
+
+        /*
+         * from wolfrom alpha
+         * http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
+         */
+        expectation = -1.00888;
+        calculation = LatW.toFixed(5);
+        result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+
+        assert.equal(expectation, result);
+        assert.equal(calculation, result);
+      });
+
+      it('WITH regularization', function() {
+        var C = 0.1;
+
+        LatW = -LatW + 0.5 * C * w.dot(w);
+
+        /*
+         * from wolfrom alpha
+         * http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
+         */
+        expectation = 1.05888;
+        calculation = LatW.toFixed(5);
+        result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+
+        assert.equal(expectation, result);
+        assert.equal(calculation, result);
       });
     });
 
-    describe('with regularization', function() {
-      var C = 0.1;
-
-      it('computes the logLikelihood for a single dependent variable', function() {
-        var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
-
-        /*
-         * Simple enough to outline the component steps
-         *
-         * Z[0] = 1*1
-         * logistic[0] = 1/(1 + exp(-1*1))
-         * sum[0] = log(1 * 1/(1 + exp(-1*1)))
-         *
-         * Z[1] = 1*3
-         * logistic[1] = 1/(1 + exp(-3*0))
-         * sum[1] = log(1/(1 + exp(-3*0)))
-         *
-         * Z[2] = 1*6
-         * logistic[2] = 1/(1 + exp(-1*6))
-         * sum[2] = log(1/(1 + exp(-1*6)))
-         *
-         * L(w) = -(sum[0] + sum[1] + sum[2]) + 0.5 * C * w dot w
-         */
-        // from wolfrom alpha
-        // http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
-        assert.equal(1.05888, subject.logLikelihood(w, Y, X, C).toFixed(5));
+    describe('2 dependent variables', function() {
+      beforeEach(function() {
+        w = linear.Vector.create([1,1]);
+        X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        Y = linear.Vector.create([1,0,1]);
       });
 
-      it('computes the logLikelihood for 2 dependent variables', function() {
-        var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
-        // from wolfrom alpha
-        // http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-        assert.equal(0.84175, subject.logLikelihood(w, Y, X, C).toFixed(5));
+      it('without regularization', function() {
+        var C = 0.0;
+
+        /*
+         * from wolfrom alpha
+         * http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
+         */
+        var expectation = -0.74175;
+        var result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+
+        assert.equal(expectation, result);
+      });
+
+      it('WITH regularization', function() {
+        var C = 0.1;
+
+        /*
+         * from wolfrom alpha
+         * http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
+         */
+        var expectation = 0.84175;
+        var result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+
+        assert.equal(expectation, result);
       });
     });
   });
 
   describe('#logLikelihoodGradient', function() {
+    var w, X, Y, partialLatW, Z1, Z2, Z3;
+
     var g = function(Y, Z) {
       return subject.logistic(-Y * Z);
     };
 
-    describe('without regularization', function() {
-      var C = 0.0;
+    describe('single dependent variable', function() {
+      beforeEach(function() {
+        w = linear.Vector.create([1]);
+        X = linear.Matrix.create([[1],[3],[6]]);
+        Y = linear.Vector.create([1,0,1]);
 
-      it('computes the logLikelihood gradient vector for a single dependent variable', function() {
-        var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
+        partialLatW = [0];
 
-        var partialLatK = [0];
+        // Since the only difference between regularization is a constant factor
+        // work out the sum here
+        Z1 = 1 * 1;
+        Z2 = 1 * 3;
+        Z3 = 1 * 6;
 
-        // Simple enough to calculate the vector components
-        var Z1 = 1 * 1;
-        var Z2 = 1 * 3;
-        var Z3 = 1 * 6;
+        partialLatW[0] += 1 * 1 * g(1, Z1);
+        partialLatW[0] += 0 * 3 * g(0, Z2);
+        partialLatW[0] += 1 * 6 * g(1, Z3);
+      });
 
-        partialLatK[0] += 1 * 1 * g(1, Z1);
-        partialLatK[0] += 0 * 3 * g(0, Z2);
-        partialLatK[0] += 1 * 6 * g(1, Z3);
+      it('without regularization', function() {
+        var C = 0.0;
 
-        var expectedPartialL = linear.Vector.create(partialLatK);
-
+        var expectedPartialL = linear.Vector.create(partialLatW);
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
         assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
       });
 
-      it('computes the logLikelihoodGradient for 2 dependent variables', function() {
-        var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
+      it('WITH regularization', function() {
+        var C = 0.1;
 
-        var partialLatK = [0,0];
+        // Account for regularization
+        partialLatW[0] = -partialLatW + C * 1;
+
+        var expectedPartialL = linear.Vector.create(partialLatW);
+        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+
+        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+      });
+    });
+
+    describe('2 dependent variables', function() {
+      beforeEach(function() {
+        w = linear.Vector.create([1,1]);
+        X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        Y = linear.Vector.create([1,0,1]);
+
+        partialLatW = [0,0];
 
         // Simple enough to calculate the vector components
-        var Z1 = 1 * 1 + 1 * 2;
-        var Z2 = 1 * 3 + 1 * 4;
-        var Z3 = 1 * 5 + 1 * 6;
+        Z1 = 1 * 1 + 1 * 2;
+        Z2 = 1 * 3 + 1 * 4;
+        Z3 = 1 * 5 + 1 * 6;
 
-        partialLatK[0] += 1 * 1 * g(1, Z1);
-        partialLatK[0] += 0 * 3 * g(0, Z2);
-        partialLatK[0] += 1 * 5 * g(1, Z3);
+        partialLatW[0] += 1 * 1 * g(1, Z1);
+        partialLatW[0] += 0 * 3 * g(0, Z2);
+        partialLatW[0] += 1 * 5 * g(1, Z3);
 
-        partialLatK[1] += 1 * 2 * g(1, Z1);
-        partialLatK[1] += 0 * 4 * g(0, Z2);
-        partialLatK[1] += 1 * 6 * g(1, Z3);
+        partialLatW[1] += 1 * 2 * g(1, Z1);
+        partialLatW[1] += 0 * 4 * g(0, Z2);
+        partialLatW[1] += 1 * 6 * g(1, Z3);
+      });
 
-        expectedPartialL = linear.Vector.create(partialLatK);
+      it('without regularization', function() {
+        var C = 0.0;
+
+        expectedPartialL = linear.Vector.create(partialLatW);
 
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
         assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
         assert.equal(expectedPartialL.e(2).toFixed(5), calculatedPartialL.e(2).toFixed(5));
       });
-    });
 
-    describe('WITH regularization', function() {
-      var C = 1.0;
+      it('WITH regularization', function() {
+        var C = 0.1;
 
-      it('computes the logLikelihood gradient vector for a single dependent variable', function() {
-        var w = linear.Vector.create([1]);
-        var X = new linear.Matrix.create([[1],[3],[6]]);
-        var Y = [1,0,1];
+        partialLatW[0] = -partialLatW[0] + C * 1;
+        partialLatW[1] = -partialLatW[1] + C * 1;
 
-        var partialLatK = [0];
-
-        // Simple enough to calculate the vector components
-        var Z1 = 1 * 1;
-        var Z2 = 1 * 3;
-        var Z3 = 1 * 6;
-
-        partialLatK[0] -= 1 * 1 * g(1, Z1);
-        partialLatK[0] -= 0 * 3 * g(0, Z2);
-        partialLatK[0] -= 1 * 6 * g(1, Z3);
-        partialLatK[0] += C * 1;
-
-        var expectedPartialL = linear.Vector.create(partialLatK);
-
-        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
-
-        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
-      });
-
-      it('computes the logLikelihoodGradient for 2 dependent variables', function() {
-        var w = linear.Vector.create([1,1]);
-        var X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        var Y = [1,0,1];
-
-        var partialLatK = [0,0];
-
-        // Simple enough to calculate the vector components
-        var Z1 = 1 * 1 + 1 * 2;
-        var Z2 = 1 * 3 + 1 * 4;
-        var Z3 = 1 * 5 + 1 * 6;
-
-        partialLatK[0] -= 1 * 1 * g(1, Z1);
-        partialLatK[0] -= 0 * 3 * g(0, Z2);
-        partialLatK[0] -= 1 * 5 * g(1, Z3);
-        partialLatK[0] += C * 1;
-
-        partialLatK[1] -= 1 * 2 * g(1, Z1);
-        partialLatK[1] -= 0 * 4 * g(0, Z2);
-        partialLatK[1] -= 1 * 6 * g(1, Z3);
-        partialLatK[1] += C * 1;
-
-        expectedPartialL = linear.Vector.create(partialLatK);
+        expectedPartialL = linear.Vector.create(partialLatW);
 
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
@@ -378,13 +422,15 @@ describe('Logistical', function(){
     it('should not accept a negative value', function() {
       assert.throws(function() {
         subject.generateRandomCoefficients(-5);
-      })
+      });
     });
+
     it('should not accept a zero value', function() {
       assert.throws(function() {
         subject.generateRandomCoefficients(0);
-      })
+      });
     });
+
     it('should generate a different matrix every time', function() {
       var w1 = subject.generateRandomCoefficients(10);
       var w2 = subject.generateRandomCoefficients(10);
@@ -401,38 +447,46 @@ describe('Logistical', function(){
 
   /* Test the calculation of error between the calculated and expected outcomes from a given input data set */
   describe('#calculateError', function() {
-    it('should not null input values', function() {
+    it('should not allow null input values', function() {
       assert.throws(function() {
-        subject.calculateError(null, null);
-      },
-        /null/
-      );
-    });
-    it('should not accept empty input values', function() {
-      assert.throws(function() {
-        var err = subject.calculateError(linear.Vector.create([]),
-                                         linear.Matrix.create([[]]));
+          subject.calculateError(null, null, null);
         },
-        /empty/
+        /Null/
       );
     });
-    it('should not accept mismatched dimensions', function() {
+
+    it('should not accept empty input values', function() {
+      var w = linear.Vector.create([]);
+      var X = linear.Matrix.create([[]]);
+      var Y_exp = linear.Vector.create([]);
+
       assert.throws(function() {
-        var err = subject.calculateError(linear.Vector.Zero(5),
-                                         linear.Matrix.Zero(6, 5));
+          subject.calculateError(w, X, Y_exp);
+        },
+        /Empty/
+      );
+    });
+
+    it('should not accept mismatched dimensions', function() {
+      var w = linear.Vector.create([1,1,1,1,1]);
+      var X = linear.Matrix.Zero(6,5);
+      var Y_exp = linear.Vector.Zero(5);
+
+      assert.throws(function() {
+          subject.calculateError(w, X, Y_exp);
         },
         /dimensions/
       );
     });
+
     it('should calculate the correct error', function() {
-      // test inputs
-      var Y_exp = linear.Vector.create([0, 1, 0, 1, 0]);
+      var w = linear.Vector.create([1,1]);
       var X = linear.Matrix.Zero(5, 2);
+      var Y_exp = linear.Vector.create([0, 1, 0, 1, 0]);
 
-      var err = subject.calculateError(X, Y_exp);
+      var err = subject.calculateError(w, X, Y_exp);
 
-      assert.equal(0.6, err);
-
+      assert.equal(0.4, err);
     });
   });
 

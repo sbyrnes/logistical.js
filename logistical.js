@@ -30,14 +30,14 @@ var Classifier = function() {
  * Xi = vector of training data with k elements
  */
 Classifier.prototype.ZiPartialSum = function(w, Xi) {
-  Support.validateNull(w, Xi);
-  Support.validateVector(w, Xi);
-  Support.hasEqualElementCount(w, Xi);
+  Support.assertNull(w, Xi);
+  Support.assertVector(w, Xi);
+  Support.assertEqualElementCount(w, Xi);
 
   var dotProduct = w.dot(Xi);
 
   // play nice with the caller because null is technically a "failure"
-  Support.validateNull(dotProduct);
+  Support.assertNull(dotProduct);
 
   return dotProduct;
 };
@@ -51,12 +51,12 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * C = Regularization constant
  */
 Classifier.prototype.logLikelihood = function(w, Y, X, C) {
-  Support.validateVector(w);
-  Support.validateVector(Y);
-  Support.validateMatrix(X);
+  Support.assertVector(w);
+  Support.assertVector(Y);
+  Support.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
-  Support.hasEqualElementCount(w, X.row(1));
+  Support.assertEqualElementCount(w, X.row(1));
 
   var N = Y.cols();
 
@@ -85,12 +85,12 @@ Classifier.prototype.logLikelihood = function(w, Y, X, C) {
  * Returns a vector of gradients with respect to the coefficients
  */
 Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
-  Support.validateVector(w);
-  Support.validateVector(Y);
-  Support.validateMatrix(X);
+  Support.assertVector(w);
+  Support.assertVector(Y);
+  Support.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
-  Support.hasEqualElementCount(w, X.row(1));
+  Support.assertEqualElementCount(w, X.row(1));
 
   var K = w.cols();
   var N = Y.cols();
@@ -133,10 +133,10 @@ Classifier.prototype.generateRandomCoefficients = function(size) {
  * Y_exp = array of labels for the data (Y1, Y2, ..., Yn)
  */
 Classifier.prototype.calculateError = function(w, X, Y_exp) {
-  Support.validateNull(X, Y_exp);
-  Support.validateEmpty(X, Y_exp);
-  Support.validateVector(w, Y_exp);
-  Support.validateMatrix(X);
+  Support.assertNull(X, Y_exp);
+  Support.assertEmpty(X, Y_exp);
+  Support.assertVector(w, Y_exp);
+  Support.assertMatrix(X);
 
   if (!Support.isMatching(Y_exp, X))
     throw new Error("Error: mismatching input dimensions");
@@ -164,7 +164,7 @@ Classifier.prototype.calculateError = function(w, X, Y_exp) {
  * z - Numeric value to compute function on
  */
 Classifier.prototype.logistic = function(z) {
-  Support.validateNumeric(z);
+  Support.assertNumeric(z);
 
   return 1.0 / (1.0 + Math.exp(-z));
 };
@@ -195,7 +195,6 @@ Classifier.prototype.predict = function(w, data) {
 Classifier.prototype.classify = function(w, data) {
   var prediction = this.predict(w, data);
 
-  // if the prediction is over 1/2, classify as 1 otherwise 0
   return (prediction > 0.5) ? 1 : 0;
 };
 

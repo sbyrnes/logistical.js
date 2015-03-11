@@ -36,14 +36,8 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
 
   var dotProduct = w.dot(Xi);
 
-  Support.validateNull(dotProduct);
-
   // play nice with the caller because null is technically a "failure"
-  /*
-  if ( dotProduct === null ) {
-    throw new Error('Unable to compute the dot product');
-  }
-  */
+  Support.validateNull(dotProduct);
 
   return dotProduct;
 };
@@ -133,6 +127,10 @@ Classifier.prototype.generateRandomCoefficients = function(size) {
 
 /*
  * Calculates the error of the provided model as applied to the input data and expected outcomes.
+ *
+ * w = Vector coefficients
+ * X = Matrix of training data vecors (X1, X2, ..., Xn)
+ * Y_exp = array of labels for the data (Y1, Y2, ..., Yn)
  */
 Classifier.prototype.calculateError = function(w, X, Y_exp) {
   Support.validateNull(X, Y_exp);
@@ -180,6 +178,9 @@ Classifier.prototype.train = function(expectedValue, data) {
 
 /*
  * Predicts the probability of the specified value for the given data.
+ *
+ * w = Vector coefficients
+ * data = Matrix of training data vecors (X1, X2, ..., Xn)
  */
 Classifier.prototype.predict = function(w, data) {
   return this.logistic(w.dot(data));
@@ -187,6 +188,9 @@ Classifier.prototype.predict = function(w, data) {
 
 /*
  * Classifies the provided example.
+ *
+ * w = Vector coefficients
+ * data = Matrix of training data vecors (X1, X2, ..., Xn)
  */
 Classifier.prototype.classify = function(w, data) {
   var prediction = this.predict(w, data);

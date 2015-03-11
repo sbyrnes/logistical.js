@@ -21,7 +21,7 @@ var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent auto
  */
 var Classifier = function() {
   this.coefficientModel = [];
- };
+};
 
 /*
  * Intermediate function for calculating the partial sum for the likelihood

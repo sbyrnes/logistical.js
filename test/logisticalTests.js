@@ -254,7 +254,7 @@ describe('Logistical', function(){
   });
 
   describe('#logLikelihoodGradient', function() {
-    var w, X, Y, partialLatK, Z1, Z2, Z3;
+    var w, X, Y, partialLatW, Z1, Z2, Z3;
 
     var g = function(Y, Z) {
       return subject.logistic(-Y * Z);
@@ -266,7 +266,7 @@ describe('Logistical', function(){
         X = linear.Matrix.create([[1],[3],[6]]);
         Y = linear.Vector.create([1,0,1]);
 
-        partialLatK = [0];
+        partialLatW = [0];
 
         // Since the only difference between regularization is a constant factor
         // work out the sum here
@@ -274,15 +274,15 @@ describe('Logistical', function(){
         Z2 = 1 * 3;
         Z3 = 1 * 6;
 
-        partialLatK[0] += 1 * 1 * g(1, Z1);
-        partialLatK[0] += 0 * 3 * g(0, Z2);
-        partialLatK[0] += 1 * 6 * g(1, Z3);
+        partialLatW[0] += 1 * 1 * g(1, Z1);
+        partialLatW[0] += 0 * 3 * g(0, Z2);
+        partialLatW[0] += 1 * 6 * g(1, Z3);
       });
 
       it('without regularization', function() {
         var C = 0.0;
 
-        var expectedPartialL = linear.Vector.create(partialLatK);
+        var expectedPartialL = linear.Vector.create(partialLatW);
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
         assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
@@ -292,9 +292,9 @@ describe('Logistical', function(){
         var C = 0.1;
 
         // Account for regularization
-        partialLatK[0] = -partialLatK + C * 1;
+        partialLatW[0] = -partialLatW + C * 1;
 
-        var expectedPartialL = linear.Vector.create(partialLatK);
+        var expectedPartialL = linear.Vector.create(partialLatW);
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
         assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
@@ -307,26 +307,26 @@ describe('Logistical', function(){
         X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
         Y = linear.Vector.create([1,0,1]);
 
-        partialLatK = [0,0];
+        partialLatW = [0,0];
 
         // Simple enough to calculate the vector components
         Z1 = 1 * 1 + 1 * 2;
         Z2 = 1 * 3 + 1 * 4;
         Z3 = 1 * 5 + 1 * 6;
 
-        partialLatK[0] += 1 * 1 * g(1, Z1);
-        partialLatK[0] += 0 * 3 * g(0, Z2);
-        partialLatK[0] += 1 * 5 * g(1, Z3);
+        partialLatW[0] += 1 * 1 * g(1, Z1);
+        partialLatW[0] += 0 * 3 * g(0, Z2);
+        partialLatW[0] += 1 * 5 * g(1, Z3);
 
-        partialLatK[1] += 1 * 2 * g(1, Z1);
-        partialLatK[1] += 0 * 4 * g(0, Z2);
-        partialLatK[1] += 1 * 6 * g(1, Z3);
+        partialLatW[1] += 1 * 2 * g(1, Z1);
+        partialLatW[1] += 0 * 4 * g(0, Z2);
+        partialLatW[1] += 1 * 6 * g(1, Z3);
       });
 
       it('without regularization', function() {
         var C = 0.0;
 
-        expectedPartialL = linear.Vector.create(partialLatK);
+        expectedPartialL = linear.Vector.create(partialLatW);
 
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 
@@ -337,10 +337,10 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        partialLatK[0] = -partialLatK[0] + C * 1;
-        partialLatK[1] = -partialLatK[1] + C * 1;
+        partialLatW[0] = -partialLatW[0] + C * 1;
+        partialLatW[1] = -partialLatW[1] + C * 1;
 
-        expectedPartialL = linear.Vector.create(partialLatK);
+        expectedPartialL = linear.Vector.create(partialLatW);
 
         var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
 

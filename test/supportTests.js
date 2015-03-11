@@ -169,6 +169,58 @@ describe('support', function() {
     });
   });
 
+  describe('#assertEqualElementCount', function() {
+    var i, j, k;
+
+    beforeEach(function() {
+      i = linear.Vector.create([1,2,3]);
+      j = linear.Vector.create([4,5,6]);
+      k = linear.Vector.create([1,2,3,4]);
+    });
+
+    it('does not throw errors on equal count', function() {
+      assert.doesNotThrow(function() {
+          support.assertEqualElementCount(i, j);
+        },
+        /Error/
+      );
+    });
+
+    it('throws error on non-equal count', function() {
+      assert.throws(function() {
+          support.assertEqualElementCount(i, m);
+        },
+        /Error/
+      );
+    });
+  });
+
+  describe('#assertEqualDimensions', function() {
+    var m, n, o;
+
+    beforeEach(function() {
+      m = linear.Matrix.create([[1,2,3],[4,5,6],[7,8,9]]);
+      n = linear.Matrix.create([[7,8,9],[3,2,1],[0,1,2]]);
+      o = linear.Matrix.create([[1,2],[3,4],[5,6],[7,8]]);
+    });
+
+    it('does not throw errors on equal dimensions', function() {
+      assert.doesNotThrow(function() {
+          support.assertEqualDimensions(m, n);
+        },
+        /Error/
+      );
+    });
+
+    it('throws error on non-equal dimensions', function() {
+      assert.throws(function() {
+          support.assertEqualDimensions(n, o);
+        },
+        /Error/
+      );
+    });
+  });
+
   describe('Numeric', function() {
     beforeEach(function() {
       test = [
@@ -318,6 +370,51 @@ describe('support', function() {
           },
           /Error/
         );
+      });
+    });
+
+    describe('#isMatching', function() {
+      var result;
+      var i, j, k;
+      var m, n, o;
+
+      beforeEach(function() {
+        i = linear.Vector.create([1,2,3]);
+        j = linear.Vector.create([4,5,6]);
+        k = linear.Vector.create([1,2,3,4]);
+
+        m = linear.Matrix.create([[1,2,3],[4,5,6],[7,8,9]]);
+        n = linear.Matrix.create([[7,8,9],[3,2,1]]);
+        o = linear.Matrix.create([[1,2],[3,4],[5,6],[7,8]]);
+      });
+
+      describe('Vector', function() {
+        it('returns true on equal dimensions', function() {
+          result = support.isMatching(i, j);
+          assert.equal(true, result);
+        });
+
+        it('returns false on non-equal dimensions', function() {
+          result = support.isMatching(i, k);
+          assert.equal(false, result);
+        });
+      });
+      describe('Vector and Matrix', function() {
+        it('returns true on equal dimensions', function() {
+          result = support.isMatching(i, m);
+          assert.equal(true, result);
+
+          result = support.isMatching(k, o);
+          assert.equal(true, result);
+        });
+
+        it('returns false on non-equal dimensions', function() {
+          result = support.isMatching(i, n);
+          assert.equal(false, result);
+
+          result = support.isMatching(i, o);
+          assert.equal(false, result);
+        });
       });
     });
   });

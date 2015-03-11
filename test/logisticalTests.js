@@ -39,7 +39,7 @@ describe('Logistical', function(){
       small.resultIndex = 2;     // Index of the result value in the training sets
 
   /* Tasks to complete before running any tests */
-  before(function(done){
+  before(function(done) {
 
     async.series([
       function(nextStep) {
@@ -137,8 +137,17 @@ describe('Logistical', function(){
     it('tests that the vectors have the same number of elements', function() {
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
-      assert.doesNotThrow( function() { subject.ZiPartialSum(w, X.row(1)); }, Error );
-      assert.throws( function() {subject.ZiPartialSum(w. Z.row(1)); }, Error);
+      assert.doesNotThrow( function() {
+          subject.ZiPartialSum(w, X.row(1));
+        },
+        Error
+      );
+
+      assert.throws( function() {
+          subject.ZiPartialSum(w. Z.row(1));
+        },
+        Error
+      );
     });
 
     it('calculates the proper sum', function() {

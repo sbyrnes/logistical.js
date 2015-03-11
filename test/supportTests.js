@@ -302,7 +302,7 @@ describe('support', function() {
     });
 
     describe('#assertEmpty', function() {
-      it('does not throws error for non-empty', function() {
+      it('does not throw error for non-empty', function() {
         for (var i = 0; i < test.length; i++) {
           assert.doesNotThrow(function() {
               support.assertEmpty(test[i]);
@@ -312,8 +312,8 @@ describe('support', function() {
         }
       });
 
-      it('does throw error for empty', function() {
-        assert.doesNotThrow(function() {
+      it('throws error for empty', function() {
+        assert.throws(function() {
             support.assertEmpty(empty[0], empty[1], empty[3]);
           },
           /Error/

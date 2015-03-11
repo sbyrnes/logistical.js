@@ -248,7 +248,7 @@ describe('support', function() {
     });
 
     describe('#assertNull', function() {
-      it('does not throws error for non-null', function() {
+      it('throws error for non-null', function() {
         for (var i = 0; i < test.length; i++) {
           assert.doesNotThrow(function() {
               support.assertNull(test[i]);
@@ -259,8 +259,8 @@ describe('support', function() {
       });
 
       it('does throw error for null', function() {
-         assert.doesNotThrow(function() {
-             support.assertNull(['asdf', null]);
+         assert.throws(function() {
+             support.assertNull('asdf', null);
            },
            /Error/
          );
@@ -268,7 +268,7 @@ describe('support', function() {
     });
   });
 
-  describe.only('Empty', function() {
+  describe('Empty', function() {
     var empty;
 
     beforeEach(function() {
@@ -281,10 +281,9 @@ describe('support', function() {
       empty = [
         [],
         linear.Vector.create([]),
-        linear.Matrix.create([[null]]),
+        linear.Matrix.create([[]]),
       ];
     });
-
 
     describe('#isEmpty', function() {
       it('returns false for non-empty', function() {
@@ -297,13 +296,12 @@ describe('support', function() {
       it('returns true for empty', function() {
         for (var i = 0; i < test.length; i++) {
           result = support.isEmpty(empty[i]);
-          debugger
           assert.equal(true, result);
         }
       });
     });
 
-    describe.skip('#assertEmpty', function() {
+    describe('#assertEmpty', function() {
       it('does not throws error for non-empty', function() {
         for (var i = 0; i < test.length; i++) {
           assert.doesNotThrow(function() {
@@ -315,11 +313,11 @@ describe('support', function() {
       });
 
       it('does throw error for empty', function() {
-         assert.doesNotThrow(function() {
-             support.assertEmpty(['asdf', null]);
-           },
-           /Error/
-         );
+        assert.doesNotThrow(function() {
+            support.assertEmpty(empty[0], empty[1], empty[3]);
+          },
+          /Error/
+        );
       });
     });
   });

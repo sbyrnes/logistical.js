@@ -149,14 +149,25 @@ describe('Logistical', function(){
   });
 
   describe('#logLikelihood', function() {
+    var w, X, Y, LatW;
+
     var g = function(Y, Z) {
       return subject.logistic(Y * Z);
     };
 
     describe('single dependent variable', function() {
-      var w = linear.Vector.create([1]);
-      var X = linear.Matrix.create([[1],[3],[6]]);
-      var Y = linear.Vector.create([1,0,1]);
+      beforeEach(function() {
+        w = linear.Vector.create([1]);
+        X = linear.Matrix.create([[1],[3],[6]]);
+        Y = linear.Vector.create([1,0,1]);
+
+        Z = [1 * 1, 1 * 3, 1 * 6];
+        LatW = 0.0;
+
+        for ( var i = 0; i < 3; i++ ) {
+          LatW += Math.log( g(Y.e(i+1), Z[i]) );
+        }
+      });
 
       /*
        * Outlining the math steps we have
@@ -176,12 +187,6 @@ describe('Logistical', function(){
        */
       it('without regularization', function() {
         var C = 0.0;
-        var Z = [1 * 1, 1 * 3, 1 * 6];
-        var LatW = 0.0;
-
-        for ( var i = 0; i < 3; i++ ) {
-          LatW += Math.log( g(Y.e(i+1), Z[i]) );
-        }
 
         /*
          * from wolfrom alpha
@@ -197,12 +202,6 @@ describe('Logistical', function(){
 
       it('WITH regularization', function() {
         var C = 0.1;
-        var Z = [1 * 1, 1 * 3, 1 * 6];
-        var LatW = 0.0;
-
-        for ( var i = 0; i < 3; i++ ) {
-          LatW += Math.log( g(Y.e(i+1), Z[i]) );
-        }
 
         LatW = -LatW + 0.5 * C * w.dot(w);
 
@@ -220,9 +219,11 @@ describe('Logistical', function(){
     });
 
     describe('2 dependent variables', function() {
-      var w = linear.Vector.create([1,1]);
-      var X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
-      var Y = linear.Vector.create([1,0,1]);
+      beforeEach(function() {
+        w = linear.Vector.create([1,1]);
+        X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
+        Y = linear.Vector.create([1,0,1]);
+      });
 
       it('without regularization', function() {
         var C = 0.0;

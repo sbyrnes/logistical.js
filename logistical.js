@@ -108,7 +108,6 @@ Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
 
     for (var i = 1; i <= N; i++) {
       sum += Y.e(i) * X.e(i, k+1) * this.logistic(-Y.e(i) * this.ZiPartialSum(w, X.row(i)));
-      debugger
     }
 
     // Account for regularization

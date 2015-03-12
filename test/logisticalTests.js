@@ -1,4 +1,4 @@
-/* logistical.js
+/* logisticalTests.js
  *
  * Tests for the logistical.js library
  *
@@ -266,7 +266,6 @@ describe('Logistical', function(){
     var w, X, Y, partialLatW, Z1, Z2, Z3;
 
     var g = function(Y, Z) {
-      debugger
       return subject.logistic(-Y * Z);
     };
 

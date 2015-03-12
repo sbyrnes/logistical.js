@@ -29,7 +29,7 @@
   ],
   "config": {
     "blanket": {
-      "pattern": "test",
+      "pattern": "logistical",
       "data-cover-never": "node_modules"
     }
   },

@@ -1,4 +1,4 @@
-/* logistical.js
+/* supportTests.js
  *
  * Tests for the support library
  *

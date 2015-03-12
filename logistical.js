@@ -1,4 +1,5 @@
 /* logistical.js
+ *
  * A logistical regression classifier for Node.js
  *
  * Authors: Wes Bailey @baywes, Sean Byrnes @sbyrnes

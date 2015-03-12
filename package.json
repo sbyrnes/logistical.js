@@ -27,6 +27,12 @@
       "url": "http://fogstack.com"
     }
   ],
+  "config": {
+    "blanket": {
+      "pattern": "logistical",
+      "data-cover-never": "node_modules"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/sbyrnes/logistical.js"

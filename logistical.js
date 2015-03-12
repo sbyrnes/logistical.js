@@ -1,4 +1,5 @@
 /* logistical.js
+ *
  * A logistical regression classifier for Node.js
  *
  * Authors: Wes Bailey @baywes, Sean Byrnes @sbyrnes
@@ -21,7 +22,7 @@ var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent auto
  */
 var Classifier = function() {
   this.coefficientModel = [];
- };
+};
 
 /*
  * Intermediate function for calculating the partial sum for the likelihood

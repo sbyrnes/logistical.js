@@ -1,4 +1,4 @@
-/* logistical.js
+/* logisticalTests.js
  *
  * Tests for the logistical.js library
  *

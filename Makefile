@@ -1,7 +1,7 @@
 test: tests
 tests:
 	#./node_modules/gulp/bin/gulp.js mocha
-	./node_modules/mocha/bin/mocha 
+	./node_modules/mocha/bin/mocha -R spec
 
 watch:
 	#./node_modules/gulp/bin/gulp.js watch-mocha

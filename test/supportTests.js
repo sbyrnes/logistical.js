@@ -8,8 +8,6 @@
  * Made available via the MIT License, text included in LICENSE.
  */
 
-require('blanket');
-
 // standard modules
 var assert = require("assert");
 var linear = require("Sylvester");

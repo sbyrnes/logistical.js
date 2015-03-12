@@ -8,8 +8,6 @@
  * Made available via the MIT License, text included in LICENSE.
  */
 
-require('blanket');
-
 // standard modules
 var fs = require("fs");
 var parse = require("csv-parse");

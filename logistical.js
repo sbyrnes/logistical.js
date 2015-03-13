@@ -213,6 +213,8 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
  * Trains the classifier on a given training example.
  */
 Classifier.prototype.train = function(expectedValue, data) {
+  // 1. Generate a random coefficient matrix
+  // var w = this.generateCoefficients()
   // 2. Loop for N steps in the descent
   // 2a. Calculate the gradients for w
   //    gradient = this.loglikelihoodGradient()

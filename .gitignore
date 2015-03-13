@@ -32,3 +32,6 @@ coverage.html
 
 # annoying OSX metadata
 .DS_Store
+
+# generated documentation
+out

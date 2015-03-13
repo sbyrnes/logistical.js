@@ -12,6 +12,7 @@ var Support = require('./lib/support.js');
 var Linear = require('Sylvester');
 
 // Learning parameters
+//var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
 var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
 var ALPHA = 0.0005;       // learning rate, should be small
 var BETA = 0.0007;        // regularization factor, should be small
@@ -181,13 +182,37 @@ Classifier.prototype.predict = function(w, data) {
   return this.logistic(w.dot(data));
 };
 
+Classifier.prototype.gradientDescent = function(X, Y, C) {
+  // start with random coefficients
+  var w = this.generateRandomCoefficients(X.cols());
+  var wold;
+
+  for ( var i = 0; i <= DESCENT_STEPS; i++ ) {
+    wold = w;
+
+    // Matrix math
+    gradient = this.loglikelihoodGradient(w, X, Y, C);
+    w = w.add(gradient.multiply(ALPHA).subtract(w.multiply(ALPHA * C)));
+
+    // Calculate the error of the coefficients by looking at the largest difference.
+    // Note: Sylvester uses the absolute value when calculating the max
+    var error = Math.abs(w.subtract(wold).max());
+
+    // Check convergence
+    if (i > 10 && error < MAX_ERROR) {
+      break;
+    } else if (i == DESCENT_STEPS) {
+      throw new Error('Error: Gradient Descent is not converging');
+    }
+  }
+
+  return w;
+};
+
 /*
  * Trains the classifier on a given training example.
  */
 Classifier.prototype.train = function(expectedValue, data) {
-  // 1. Generate a random coefficient matrix
-  // var w = this.generateCoefficients()
-
   // 2. Loop for N steps in the descent
   // 2a. Calculate the gradients for w
   //    gradient = this.loglikelihoodGradient()

@@ -14,7 +14,8 @@ var Linear = require('Sylvester');
 // Learning parameters
 //var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
 var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
-var ALPHA = 0.0005;       // learning rate, should be small
+//var ALPHA = 0.0005;       // learning rate, should be small
+var ALPHA = 1.0000;       // learning rate, should be small
 var BETA = 0.0007;        // regularization factor, should be small
 var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
 
@@ -187,24 +188,71 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
   var w = this.generateRandomCoefficients(X.cols());
   var wold;
 
-  for ( var i = 0; i <= DESCENT_STEPS; i++ ) {
+  var K = w.cols();
+  var N = Y.cols();
+
+  console.log("Initial Coefficients");
+  console.log(w.inspect());
+
+  for ( var s = 0; s <= DESCENT_STEPS; s++ ) {
     wold = w;
 
+    /*
     // Matrix math
-    gradient = this.loglikelihoodGradient(w, X, Y, C);
-    w = w.add(gradient.multiply(ALPHA).subtract(w.multiply(ALPHA * C)));
+    var gradient = this.loglikelihoodGradient(w, X, Y, C);
+    var gradientByAlpha = gradient.multiply(ALPHA);
+    var regularizationFactor = w.multiply(ALPHA * C);
+    var sum = gradientByAlpha.subtract(regularizationFactor);
+
+    w = w.add(sum);
+
+    //w = w.add(gradient.multiply(ALPHA).subtract(w.multiply(ALPHA * C)));
+
+    console.log("coefficients: " + w.inspect());
+    console.log("gradient: " + gradient.inspect());
+    console.log("gradient muliple: " + gradientByAlpha.inspect());
+    console.log("regularization: " + regularizationFactor.inspect());
+    console.log("sum: " + sum.inspect());
 
     // Calculate the error of the coefficients by looking at the largest difference.
     // Note: Sylvester uses the absolute value when calculating the max
+    */
+
+    var sumk = [];
+    var sum;
+
+    for (var k = 0; k < K; k++) {
+      sum = 0.0;
+
+      for (var i = 0; i <= N; i++) {
+        sum += this.likelihoodGradient(w, X, Y, C);
+      }
+
+      // Account for regularization
+      if ( C > 0 ) {
+        sum = sum + ALPHA * C * w.e(k+1);
+      }
+
+      sum[k] = sum;
+    }
+
+
+
     var error = Math.abs(w.subtract(wold).max());
 
     // Check convergence
-    if (i > 10 && error < MAX_ERROR) {
+    if (s > 10 && error < MAX_ERROR) {
+      console.log("Converged after " + s.toString() + " steps");
       break;
-    } else if (i == DESCENT_STEPS) {
+    } else if (s == DESCENT_STEPS) {
       throw new Error('Error: Gradient Descent is not converging');
     }
   }
+
+  console.log("Final Coefficients");
+  console.log(w.inspect());
+
+  debugger
 
   return w;
 };

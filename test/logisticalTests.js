@@ -360,8 +360,9 @@ describe('Logistical', function(){
   });
 
   describe('#gradientDescent', function() {
-    it.only('converges', function() {
-      var x = small.training.slice(0);
+    it('converges on small data set', function() {
+      // in principle i am making a copy
+      var x = small.training.slice();
       var y = [];
 
       for (var i = 0, l = x.length; i < l; i++) {
@@ -372,6 +373,26 @@ describe('Logistical', function(){
       var X = linear.Matrix.create(x);
       var Y = linear.Vector.create(y);
       var C = 0.0001;
+
+      assert.doesNotThrow(function() {
+          subject.gradientDescent(X, Y, C);
+        },
+        /Error/
+      );
+    });
+
+    it.only('converges on large data set', function() {
+      var x = large.training.slice(0);
+      var y = [];
+
+      for (var i = 0, l = x.length; i < l; i++) {
+        var val = x[i].splice(small.resultIndex, 1);
+        y[i] = val.pop();
+      }
+
+      var X = linear.Matrix.create(x);
+      var Y = linear.Vector.create(y);
+      var C = 0.1;
 
       assert.doesNotThrow(function() {
           subject.gradientDescent(X, Y, C);

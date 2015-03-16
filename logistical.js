@@ -194,9 +194,6 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
   console.log("Initial Coefficients");
   console.log(w.inspect());
 
-  for ( var s = 0; s <= DESCENT_STEPS; s++ ) {
-    wold = w;
-
     /*
     // Matrix math
     var gradient = this.loglikelihoodGradient(w, X, Y, C);
@@ -218,25 +215,28 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
     // Note: Sylvester uses the absolute value when calculating the max
     */
 
-    var sumk = [];
+  for ( var s = 0; s <= DESCENT_STEPS; s++ ) {
+    wold = w;
+
+    var watk = [];
     var sum;
 
     for (var k = 0; k < K; k++) {
       sum = 0.0;
 
       for (var i = 0; i <= N; i++) {
-        sum += this.likelihoodGradient(w, X, Y, C);
+        sum += this.loglikelihoodGradient(w, X, Y, C);
       }
 
       // Account for regularization
       if ( C > 0 ) {
-        sum = sum + ALPHA * C * w.e(k+1);
+        sum = sum - ALPHA * C * w.e(k+1);
       }
 
-      sum[k] = sum;
+      watk[k] = sum;
     }
 
-
+    w = Linear.Vector.create(watk);
 
     var error = Math.abs(w.subtract(wold).max());
 
@@ -251,8 +251,6 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
 
   console.log("Final Coefficients");
   console.log(w.inspect());
-
-  debugger
 
   return w;
 };

@@ -20,6 +20,9 @@ var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent auto
 
 /*
  * Main classifier entity.
+ *
+ * Based off of the algorithms presented in this paper also included in the repo
+ * http://cs229.stanford.edu/notes/cs229-notes1.pdf
  */
 var Classifier = function() {
   this.coefficientModel = [];
@@ -28,20 +31,18 @@ var Classifier = function() {
 /*
  * Intermediate function for calculating the partial sum for the likelihood
  *
- * w = vector coefficients with k elements
+ * ThetaT = vector coefficients with k elements
  * Xi = vector of training data with k elements
  */
-Classifier.prototype.ZiPartialSum = function(w, Xi) {
-  Support.assertNull(w, Xi);
-  Support.assertVector(w, Xi);
-  Support.assertEqualElementCount(w, Xi);
+Classifier.prototype.ZiPartialSum = function(ThetaT, Xi) {
+  Support.assertNull(ThetaT, Xi);
+  Support.assertVector(ThetaT, Xi);
+  Support.assertEqualElementCount(ThetaT, Xi);
 
-  var dotProduct = w.dot(Xi);
-
-  // play nice with the caller because null is technically a "failure"
-  Support.assertNull(dotProduct);
-
-  return dotProduct;
+  // The math says we take the sum of terms 
+  //
+  // we have vectors so dot product while we account for the first term in the sum
+  return 1.0 + ThetaT.dot(Xi);
 };
 
 /*
@@ -52,7 +53,7 @@ Classifier.prototype.ZiPartialSum = function(w, Xi) {
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  * C = Regularization constant
  */
-Classifier.prototype.logLikelihood = function(w, Y, X, C) {
+Classifier.prototype.logLikelihood = function(theta, Y, X, C) {
   Support.assertVector(w);
   Support.assertVector(Y);
   Support.assertMatrix(X);

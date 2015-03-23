@@ -104,12 +104,12 @@ describe('Logistical', function(){
   });
 
   /* Test the intermediate sum function used in the calculation of logLikelihood */
-  describe('#ZiPartialSum', function() {
-    var w, X;
+  describe.only('#ZiPartialSum', function() {
+    var Theta, X;
 
     beforeEach( function() {
       w = linear.Vector.create([1,2]);
-      X = new linear.Matrix.create([[1,2],[3,4],[5,6]]);
+      X = new linear.Matrix.create([[1,2],[3,4]]);
     });
 
     it('tests arguments for the correct type', function() {
@@ -144,16 +144,15 @@ describe('Logistical', function(){
       );
 
       assert.throws( function() {
-          subject.ZiPartialSum(w. Z.row(1));
+          subject.ZiPartialSum(w, Z.row(1));
         },
         Error
       );
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(5, subject.ZiPartialSum(w, X.row(1)));
-      assert.equal(11, subject.ZiPartialSum(w, X.row(2)));
-      assert.equal(17, subject.ZiPartialSum(w, X.row(3)));
+      assert.equal(6, subject.ZiPartialSum(w, X.row(1)));
+      assert.equal(12, subject.ZiPartialSum(w, X.row(2)));
     });
   });
 
@@ -381,7 +380,7 @@ describe('Logistical', function(){
       );
     });
 
-    it.only('converges on large data set', function() {
+    it('converges on large data set', function() {
       var x = large.training.slice(0);
       var y = [];
 

@@ -104,7 +104,7 @@ describe('Logistical', function(){
   });
 
   /* Test the intermediate sum function used in the calculation of logLikelihood */
-  describe.only('#ZiPartialSum', function() {
+  describe('#ThetaTdotX', function() {
     var Theta, X;
 
     beforeEach( function() {
@@ -114,21 +114,21 @@ describe('Logistical', function(){
 
     it('tests arguments for the correct type', function() {
       assert.doesNotThrow( function() {
-          subject.ZiPartialSum(w, X.row(1));
+          subject.ThetaTdotX(w, X.row(1));
         }
       );
     });
 
     it('does not allow null input', function() {
       assert.throws( function() {
-          subject.ZiPartialSum(null, null);
+          subject.ThetaTdotX(null, null);
         }
       );
     });
 
     it('does not allow non-numeric input', function() {
       assert.throws( function() {
-          subject.ZiPartialSum(2, 'bad');
+          subject.ThetaTdotX(2, 'bad');
         },
         TypeError
       );
@@ -138,90 +138,63 @@ describe('Logistical', function(){
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
       assert.doesNotThrow( function() {
-          subject.ZiPartialSum(w, X.row(1));
+          subject.ThetaTdotX(w, X.row(1));
         },
         Error
       );
 
       assert.throws( function() {
-          subject.ZiPartialSum(w, Z.row(1));
+          subject.ThetaTdotX(w, Z.row(1));
         },
         Error
       );
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(6, subject.ZiPartialSum(w, X.row(1)));
-      assert.equal(12, subject.ZiPartialSum(w, X.row(2)));
+      assert.equal(6, subject.ThetaTdotX(w, X.row(1)));
+      assert.equal(12, subject.ThetaTdotX(w, X.row(2)));
     });
   });
 
   describe('#logLikelihood', function() {
-    var w, X, Y, LatW;
+    var ThetaT, ThetaTdotX, X, Y, LatTheta;
 
-    var g = function(Y, Z) {
-      return subject.logistic(Y * Z);
-    };
-
-    describe('single dependent variable', function() {
+    describe.only('single dependent variable', function() {
       beforeEach(function() {
-        w = linear.Vector.create([1]);
-        X = linear.Matrix.create([[1],[3],[6]]);
+        ThetaT = linear.Vector.create([1]);
+        X = linear.Matrix.create([[1],[3],[5]]);
         Y = linear.Vector.create([1,0,1]);
 
-        Z = [1 * 1, 1 * 3, 1 * 6];
-        LatW = 0.0;
+        LatTheta = 0.0;
 
-        for ( var i = 0; i < 3; i++ ) {
-          LatW += Math.log( g(Y.e(i+1), Z[i]) );
-        }
+        // Spell out the steps
+        ThetaTdotX = 1 + 1 * 1;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTdotX));
+
+        ThetaTdotX = 1 + 1 * 3;
+        LatTheta += 1 * Math.log(1.0 - subject.logistic(ThetaTdotX));
+
+        ThetaTdotX = 1 + 1 * 5;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTdotX));
       });
 
-      /*
-       * Outlining the math steps we have
-       *
-       * Z[i] = sum[k]{w[k] * x[i][k]}
-       *
-       * g[i] = logistic(Y[i] * Z[i])
-       *
-       * L[w] = -sum[i]{log(g(Y[i],Z[i])}
-       *
-       * For our example data we have the following for the first term:
-       *
-       * Z[1] = 1 * 1
-       * g[1] = logistic(Y[1] * Z[1])
-       * L[w] = log(g(Y[1], Z[1]))
-       *
-       */
       it('without regularization', function() {
         var C = 0.0;
 
-        /*
-         * from wolfrom alpha
-         * http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
-         */
-        expectation = -1.00888;
-        calculation = LatW.toFixed(5);
-        result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+        calculation = LatTheta.toFixed(5);
+        result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
 
-        assert.equal(expectation, result);
         assert.equal(calculation, result);
       });
 
       it('WITH regularization', function() {
         var C = 0.1;
 
-        LatW = -LatW + 0.5 * C * w.dot(w);
+        LatTheta = -LatTheta + 0.5 * C * w.dot(w);
 
-        /*
-         * from wolfrom alpha
-         * http://www.wolframalpha.com/input/?i=log%281+*+1%2F%281+%2B+exp%28-1*1%29%29%29+%2B+log%281%2F%281+%2B+exp%28-3*0%29%29%29+%2B+log%281%2F%281+%2B+exp%28-1*6%29%29%29
-         */
-        expectation = 1.05888;
-        calculation = LatW.toFixed(5);
-        result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+        calculation = LatTheta.toFixed(5);
+        result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
 
-        assert.equal(expectation, result);
         assert.equal(calculation, result);
       });
     });

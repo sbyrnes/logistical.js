@@ -34,7 +34,7 @@ var Classifier = function() {
  * ThetaT = vector coefficients with k elements
  * Xi = vector of training data with k elements
  */
-Classifier.prototype.ZiPartialSum = function(ThetaT, Xi) {
+Classifier.prototype.ThetaTdotX = function(ThetaT, Xi) {
   Support.assertNull(ThetaT, Xi);
   Support.assertVector(ThetaT, Xi);
   Support.assertEqualElementCount(ThetaT, Xi);
@@ -46,27 +46,37 @@ Classifier.prototype.ZiPartialSum = function(ThetaT, Xi) {
 };
 
 /*
+ * Computes the logistic function value for a given input.
+ *
+ * z - Numeric value to compute function on
+ */
+Classifier.prototype.logistic = function(z) {
+  Support.assertNumeric(z);
+
+  return 1.0 / (1.0 + Math.exp(-z));
+};
+
+/*
  * Compute the log likelihood for a set of coefficients, data and labels
  *
- * w = Vector coefficients
- * Y = array of labels for the data (Y1, Y2, ..., Yn)
+ * Theta = Vector coefficients
+ * Y = Vector of labels for the data (Y1, Y2, ..., Yn)
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  * C = Regularization constant
  */
-Classifier.prototype.logLikelihood = function(theta, Y, X, C) {
-  Support.assertVector(w);
-  Support.assertVector(Y);
+Classifier.prototype.logLikelihood = function(Theta, Y, X, C) {
+  Support.assertVector(Theta, Y);
   Support.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
-  Support.assertEqualElementCount(w, X.row(1));
+  Support.assertEqualElementCount(Theta, X.row(1));
 
   var N = Y.cols();
 
   var sum = 0;
 
   for (var i = 1; i <= N; i++) {
-    sum += Math.log( this.logistic(Y.e(i) * this.ZiPartialSum(w, X.row(i))) );
+    sum += Y.e(i) * Math.log(this.logistic(this.ThetaTdotX(Theta, X.row(i)))) + (1 - Y.e(i)) * Math.log(1.0 - this.logistic(this.ThetaTdotX(Theta, X.row(i))));
   }
 
   // Account for regularization
@@ -80,42 +90,42 @@ Classifier.prototype.logLikelihood = function(theta, Y, X, C) {
 /*
  * Compute the gradient of the log likelihood
  *
- * w = Vector coefficients
+ * Theta = Vector coefficients
  * Y = array of labels for the data (Y1, Y2, ..., Yn)
  * X = Matrix of training data vecors (X1, X2, ..., Xn)
  * C = Regularization constant
  *
  * Returns a vector of gradients with respect to the coefficients
  */
-Classifier.prototype.loglikelihoodGradient = function(w, X, Y, C) {
-  Support.assertVector(w);
+Classifier.prototype.loglikelihoodGradient = function(Theta, X, Y, C) {
+  Support.assertVector(Theta);
   Support.assertVector(Y);
   Support.assertMatrix(X);
 
   // Ensure the partial sum will not throw an error
-  Support.assertEqualElementCount(w, X.row(1));
+  Support.assertEqualElementCount(Theta, X.row(1));
 
-  var K = w.cols();
-  var N = Y.cols();
+  var M = Theta.cols();
+  var N = X.rows();
 
-  var partialLatW = [];
+  var partialLatTheta = [];
 
-  for (var k = 0; k < K; k++) {
+  for (var j = 0; j < M; j++) {
     var sum = 0.0;
 
     for (var i = 1; i <= N; i++) {
-      sum += Y.e(i) * X.e(i, k+1) * this.logistic(-Y.e(i) * this.ZiPartialSum(w, X.row(i)));
+      sum += ALPHA * (Y.e(i) - this.logistic(this.ThetaTdotX(Theta.e(j), X.row(i)))) * x.e(j,i);
     }
 
     // Account for regularization
     if ( C > 0 ) {
-      sum = -sum + C * w.e(k+1);
+      sum = -sum + C * w.e(j);
     }
 
-    partialLatW[k] = sum;
+    partialLatTheta[j] = sum;
   }
 
-  return Linear.Vector.create(partialLatW);
+  return Linear.Vector.create(partialLatTheta);
 };
 
 /*
@@ -159,17 +169,6 @@ Classifier.prototype.calculateError = function(w, X, Y_exp) {
   var error = errorCount / X.rows();
 
   return error;
-};
-
-/*
- * Computes the logistic function value for a given input.
- *
- * z - Numeric value to compute function on
- */
-Classifier.prototype.logistic = function(z) {
-  Support.assertNumeric(z);
-
-  return 1.0 / (1.0 + Math.exp(-z));
 };
 
 

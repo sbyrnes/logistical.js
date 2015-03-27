@@ -114,7 +114,7 @@ describe('Logistical', function(){
 
     it('tests arguments for the correct type', function() {
       assert.doesNotThrow( function() {
-          subject.ThetaTx(w, X.row(1));
+          subject.ThetaTdotX(w, X.row(1));
         }
       );
     });
@@ -138,21 +138,21 @@ describe('Logistical', function(){
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
       assert.doesNotThrow( function() {
-          subject.ThetaTx(w, X.row(1));
+          subject.ThetaTdotX(w, X.row(1));
         },
         Error
       );
 
       assert.throws( function() {
-          subject.ThetaTx(w, Z.row(1));
+          subject.ThetaTdotX(w, Z.row(1));
         },
         Error
       );
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(6, subject.ThetaTx(w, X.row(1)));
-      assert.equal(12, subject.ThetaTx(w, X.row(2)));
+      assert.equal(6, subject.ThetaTdotX(w, X.row(1)));
+      assert.equal(12, subject.ThetaTdotX(w, X.row(2)));
     });
   });
 
@@ -190,7 +190,7 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        LatTheta = -LatTheta + 0.5 * C * ThetaT.dot(ThetaT);
+        LatTheta -= 0.5 * C * ThetaT.dot(ThetaT);
 
         calculation = LatTheta.toFixed(5);
         result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
@@ -230,7 +230,7 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        LatTheta = -LatTheta + 0.5 * C * ThetaT.dot(ThetaT);
+        LatTheta -= 0.5 * C * ThetaT.dot(ThetaT);
 
         expectation = LatTheta.toFixed(5);
         var result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
@@ -265,7 +265,7 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        sum = -sum + C * ThetaT.e(1);
+        sum -= C * ThetaT.e(1);
 
         var expectation = linear.Vector.create([sum]);
         var result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
@@ -315,8 +315,8 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        sum[0] = -sum[0]+ C * ThetaT.e(1);
-        sum[1] = -sum[1]+ C * ThetaT.e(2);
+        sum[0] -= C * ThetaT.e(1);
+        sum[1] -= C * ThetaT.e(2);
 
         expectation = linear.Vector.create(sum);
         result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
@@ -327,20 +327,27 @@ describe('Logistical', function(){
     });
   });
 
-  describe('#gradientDescent', function() {
-    it('converges on small data set', function() {
-      // in principle i am making a copy
-      var x = small.training.slice();
+  describe('#gradientAscent', function() {
+    var X, Y, C;
+
+    var setup = function(set) {
+      var x = set.training.slice();
       var y = [];
 
       for (var i = 0, l = x.length; i < l; i++) {
-        var val = x[i].splice(small.resultIndex, 1);
+        var val = x[i].splice(set.resultIndex, 1);
         y[i] = val.pop();
       }
 
-      var X = linear.Matrix.create(x);
-      var Y = linear.Vector.create(y);
-      var C = 0.0000;
+      return [x,y];
+    };
+
+    it('converges on small data set', function() {
+      var s = setup(small);
+
+      var X = linear.Matrix.create(s[0]);
+      var Y = linear.Vector.create(s[1]);
+      var C = 0.0001;
 
       assert.doesNotThrow(function() {
           subject.gradientDescent(X, Y, C);
@@ -350,17 +357,11 @@ describe('Logistical', function(){
     });
 
     it.only('converges on large data set', function() {
-      var x = large.training.slice(0);
-      var y = [];
+      var s = setup(large);
 
-      for (var i = 0, l = x.length; i < l; i++) {
-        var val = x[i].splice(small.resultIndex, 1);
-        y[i] = val.pop();
-      }
-
-      var X = linear.Matrix.create(x);
-      var Y = linear.Vector.create(y);
-      var C = 0.0;
+      var X = linear.Matrix.create(s[0]);
+      var Y = linear.Vector.create(s[1]);
+      var C = 0.0100;
 
       assert.doesNotThrow(function() {
           subject.gradientDescent(X, Y, C);
@@ -457,7 +458,7 @@ describe('Logistical', function(){
   });
 
   /* Test the calculation of error between the calculated and expected outcomes from a given input data set */
-  describe('#calculateError', function() {
+  describe.skip('#calculateError', function() {
     it('should not allow null input values', function() {
       assert.throws(function() {
           subject.calculateError(null, null, null);

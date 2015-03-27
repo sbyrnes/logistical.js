@@ -12,11 +12,10 @@ var Support = require('./lib/support.js');
 var Linear = require('Sylvester');
 
 // Learning parameters
-//var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
 var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
-var ALPHA = 0.0005;       // learning rate, should be small
-var BETA = 0.0005;        // regularization factor, should be small
+var ALPHA = 0.0001;       // learning rate, should be small
 var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
+var LOGGING = false;       // Whether we turn on logging or not
 
 /*
  * Main classifier entity.
@@ -80,9 +79,7 @@ Classifier.prototype.logLikelihood = function(Theta, Y, X, C) {
   }
 
   // Account for regularization
-  if ( C > 0 ) {
-    sum = -sum + 0.5 * C * Theta.dot(Theta);
-  }
+  sum -= 0.5 * C * Theta.dot(Theta);
 
   return sum;
 };
@@ -119,9 +116,7 @@ Classifier.prototype.loglikelihoodGradient = function(Theta, X, Y, C) {
     }
 
     // Account for regularization
-    if ( C > 0 ) {
-      sum = -sum + C * Theta.e(j+1);
-    }
+    sum -= C * Theta.e(j+1);
 
     partialLatTheta[j] = sum;
   }
@@ -200,19 +195,22 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
 
     Theta = Theta.add(gradientByAlpha);
   
-    var error = Math.abs(Theta.subtract(prevTheta).max());
+    var diffs = Theta.subtract(prevTheta);
+    var error = Math.abs(diffs.max());
 
-    //console.log(Theta.inspect());
-    //console.log("error: " + error.toFixed(5));
+    // console.log(Theta.inspect());
+    // console.log(diffs);
+    // console.log(s + "\t" + diffs.max() + "\t" + error + "\t" + MAX_ERROR);
 
     // Check convergence
-    if (s > 0.2 * DESCENT_STEPS && error < MAX_ERROR) {
+    if (s > 0.05 * DESCENT_STEPS && error < MAX_ERROR) {
       console.log("Converged after " + s.toString() + " steps");
       break;
     } else if (s == DESCENT_STEPS) {
       console.log("Error: Gradient Descent is not converging");
       console.log("Final Coefficients");
       console.log(Theta.inspect());
+      console.log("Convergence Test: " + error.toFixed(5));
       throw new Error('Error: Gradient Descent is not converging');
     }
   }

@@ -13,9 +13,9 @@ var Linear = require('Sylvester');
 
 // Learning parameters
 //var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
-var DESCENT_STEPS = 500; // number of iterations to execute gradient descent
-var ALPHA = 0.0100;       // learning rate, should be small
-var BETA = 0.0007;        // regularization factor, should be small
+var DESCENT_STEPS = 5000; // number of iterations to execute gradient descent
+var ALPHA = 0.0005;       // learning rate, should be small
+var BETA = 0.0005;        // regularization factor, should be small
 var MAX_ERROR = 0.0005;	  // threshold which, if reached, will stop descent automatically
 
 /*
@@ -81,7 +81,7 @@ Classifier.prototype.logLikelihood = function(Theta, Y, X, C) {
 
   // Account for regularization
   if ( C > 0 ) {
-    sum = -sum + 0.5 * C * w.dot(w);
+    sum = -sum + 0.5 * C * Theta.dot(Theta);
   }
 
   return sum;
@@ -110,16 +110,17 @@ Classifier.prototype.loglikelihoodGradient = function(Theta, X, Y, C) {
 
   var partialLatTheta = [];
 
+
   for (var j = 0; j < M; j++) {
     var sum = 0.0;
 
     for (var i = 1; i <= N; i++) {
-      sum += ALPHA * (Y.e(i) - this.logistic(this.ThetaTdotX(Theta.e(j), X.row(i)))) * x.e(j,i);
+      sum += (Y.e(i) - this.logistic(this.ThetaTdotX(Theta, X.row(i)))) * X.e(j+1,i);
     }
 
     // Account for regularization
     if ( C > 0 ) {
-      sum = -sum + C * w.e(j);
+      sum = -sum + C * Theta.e(j+1);
     }
 
     partialLatTheta[j] = sum;
@@ -184,25 +185,25 @@ Classifier.prototype.predict = function(w, data) {
 
 Classifier.prototype.gradientDescent = function(X, Y, C) {
   // start with random coefficients
-  var w = this.generateRandomCoefficients(X.cols());
-  var wfirst = w;
-  var wold;
+  var Theta = this.generateRandomCoefficients(X.cols());
+  var prevTheta;
 
-  console.log("Initial Coefficients");
-  console.log(w.inspect());
+  // console.log("Initial Coefficients");
+  // console.log(Theta.inspect());
 
   for ( var s = 0; s <= DESCENT_STEPS; s++ ) {
-    wold = w;
+    prevTheta = Theta;
 
     // Matrix math
-    var gradient = this.loglikelihoodGradient(wold, X, Y, C);
+    var gradient = this.loglikelihoodGradient(prevTheta, X, Y, C);
     var gradientByAlpha = gradient.multiply(ALPHA);
 
-    w = w.add(gradientByAlpha);
+    Theta = Theta.add(gradientByAlpha);
   
-    var error = Math.abs(w.subtract(wold).max());
+    var error = Math.abs(Theta.subtract(prevTheta).max());
 
-    console.log("error: " + error.toFixed(5));
+    //console.log(Theta.inspect());
+    //console.log("error: " + error.toFixed(5));
 
     // Check convergence
     if (s > 0.2 * DESCENT_STEPS && error < MAX_ERROR) {
@@ -210,18 +211,16 @@ Classifier.prototype.gradientDescent = function(X, Y, C) {
       break;
     } else if (s == DESCENT_STEPS) {
       console.log("Error: Gradient Descent is not converging");
-      console.log("Initial Coefficients");
-      console.log(wfirst.inspect());
       console.log("Final Coefficients");
-      console.log(w.inspect());
+      console.log(Theta.inspect());
       throw new Error('Error: Gradient Descent is not converging');
     }
   }
 
   console.log("Final Coefficients");
-  console.log(w.inspect());
+  console.log(Theta.inspect());
 
-  return w;
+  return Theta;
 };
 
 /*

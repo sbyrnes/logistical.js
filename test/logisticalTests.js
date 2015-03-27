@@ -104,7 +104,7 @@ describe('Logistical', function(){
   });
 
   /* Test the intermediate sum function used in the calculation of logLikelihood */
-  describe('#ThetaTdotX', function() {
+  describe('#ThetaTx', function() {
     var Theta, X;
 
     beforeEach( function() {
@@ -114,21 +114,21 @@ describe('Logistical', function(){
 
     it('tests arguments for the correct type', function() {
       assert.doesNotThrow( function() {
-          subject.ThetaTdotX(w, X.row(1));
+          subject.ThetaTx(w, X.row(1));
         }
       );
     });
 
     it('does not allow null input', function() {
       assert.throws( function() {
-          subject.ThetaTdotX(null, null);
+          subject.ThetaTx(null, null);
         }
       );
     });
 
     it('does not allow non-numeric input', function() {
       assert.throws( function() {
-          subject.ThetaTdotX(2, 'bad');
+          subject.ThetaTx(2, 'bad');
         },
         TypeError
       );
@@ -138,28 +138,28 @@ describe('Logistical', function(){
       var Z = linear.Matrix.create([[1,2,3],[4,5,6]]);
 
       assert.doesNotThrow( function() {
-          subject.ThetaTdotX(w, X.row(1));
+          subject.ThetaTx(w, X.row(1));
         },
         Error
       );
 
       assert.throws( function() {
-          subject.ThetaTdotX(w, Z.row(1));
+          subject.ThetaTx(w, Z.row(1));
         },
         Error
       );
     });
 
     it('calculates the proper sum', function() {
-      assert.equal(6, subject.ThetaTdotX(w, X.row(1)));
-      assert.equal(12, subject.ThetaTdotX(w, X.row(2)));
+      assert.equal(6, subject.ThetaTx(w, X.row(1)));
+      assert.equal(12, subject.ThetaTx(w, X.row(2)));
     });
   });
 
   describe('#logLikelihood', function() {
-    var ThetaT, ThetaTdotX, X, Y, LatTheta;
+    var ThetaT, ThetaTx, X, Y, LatTheta, calculation, result;
 
-    describe.only('single dependent variable', function() {
+    describe('single dependent variable', function() {
       beforeEach(function() {
         ThetaT = linear.Vector.create([1]);
         X = linear.Matrix.create([[1],[3],[5]]);
@@ -168,14 +168,14 @@ describe('Logistical', function(){
         LatTheta = 0.0;
 
         // Spell out the steps
-        ThetaTdotX = 1 + 1 * 1;
-        LatTheta += 1 * Math.log(subject.logistic(ThetaTdotX));
+        ThetaTx = 1 + 1 * 1;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTx));
 
-        ThetaTdotX = 1 + 1 * 3;
-        LatTheta += 1 * Math.log(1.0 - subject.logistic(ThetaTdotX));
+        ThetaTx = 1 + 1 * 3;
+        LatTheta += 1 * Math.log(1.0 - subject.logistic(ThetaTx));
 
-        ThetaTdotX = 1 + 1 * 5;
-        LatTheta += 1 * Math.log(subject.logistic(ThetaTdotX));
+        ThetaTx = 1 + 1 * 5;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTx));
       });
 
       it('without regularization', function() {
@@ -190,7 +190,7 @@ describe('Logistical', function(){
       it('WITH regularization', function() {
         var C = 0.1;
 
-        LatTheta = -LatTheta + 0.5 * C * w.dot(w);
+        LatTheta = -LatTheta + 0.5 * C * ThetaT.dot(ThetaT);
 
         calculation = LatTheta.toFixed(5);
         result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
@@ -201,33 +201,39 @@ describe('Logistical', function(){
 
     describe('2 dependent variables', function() {
       beforeEach(function() {
-        w = linear.Vector.create([1,1]);
+        ThetaT = linear.Vector.create([1,1]);
         X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
         Y = linear.Vector.create([1,0,1]);
+
+        LatTheta = 0.0;
+
+        // Spell out the steps
+        ThetaTx = 1 + 1 * 1 + 1 * 2;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTx));
+
+        ThetaTx = 1 + 1 * 3 + 1 * 4;
+        LatTheta += 1 * Math.log(1.0 - subject.logistic(ThetaTx));
+
+        ThetaTx = 1 + 1 * 5 + 1 * 6;
+        LatTheta += 1 * Math.log(subject.logistic(ThetaTx));
       });
 
       it('without regularization', function() {
         var C = 0.0;
 
-        /*
-         * from wolfrom alpha
-         * http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-         */
-        var expectation = -0.74175;
-        var result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+        calculation = LatTheta.toFixed(5);
+        result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
 
-        assert.equal(expectation, result);
+        assert.equal(calculation, result);
       });
 
       it('WITH regularization', function() {
         var C = 0.1;
 
-        /*
-         * from wolfrom alpha
-         * http://www.wolframalpha.com/input/?i=log%28logistic+function+3%29+%2B+log%28logistic+function+0%29+%2B+log%28logistic+function+11%29
-         */
-        var expectation = 0.84175;
-        var result = subject.logLikelihood(w, Y, X, C).toFixed(5);
+        LatTheta = -LatTheta + 0.5 * C * ThetaT.dot(ThetaT);
+
+        expectation = LatTheta.toFixed(5);
+        var result = subject.logLikelihood(ThetaT, Y, X, C).toFixed(5);
 
         assert.equal(expectation, result);
       });
@@ -235,98 +241,88 @@ describe('Logistical', function(){
   });
 
   describe('#logLikelihoodGradient', function() {
-    var w, X, Y, partialLatW, Z1, Z2, Z3;
-
-    var g = function(Y, Z) {
-      return subject.logistic(-Y * Z);
-    };
+    var expectation, result, PartialLatTheta, ThetaT, X, Y, ThetaTx;
 
     describe('single dependent variable', function() {
       beforeEach(function() {
-        w = linear.Vector.create([1]);
-        X = linear.Matrix.create([[1],[3],[6]]);
-        Y = linear.Vector.create([1,0,1]);
+        ThetaT = linear.Vector.create([1]);
+        X = linear.Matrix.create([[1]]);
+        Y = linear.Vector.create([1]);
 
-        partialLatW = [0];
-
-        // Since the only difference between regularization is a constant factor
-        // work out the sum here
-        Z1 = 1 * 1;
-        Z2 = 1 * 3;
-        Z3 = 1 * 6;
-
-        partialLatW[0] += 1 * 1 * g(1, Z1);
-        partialLatW[0] += 0 * 3 * g(0, Z2);
-        partialLatW[0] += 1 * 6 * g(1, Z3);
+        ThetaTx = 1.0 + 1 * 1;
+        sum = (1.0 - subject.logistic(ThetaTx)) * 1.0;
       });
 
       it('without regularization', function() {
         var C = 0.0;
 
-        var expectedPartialL = linear.Vector.create(partialLatW);
-        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+        expectation = linear.Vector.create([sum]);
+        result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
 
-        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+        assert.equal(expectation.e(1).toFixed(5), result.e(1).toFixed(5));
       });
 
       it('WITH regularization', function() {
         var C = 0.1;
 
-        // Account for regularization
-        partialLatW[0] = -partialLatW + C * 1;
+        sum = -sum + C * ThetaT.e(1);
 
-        var expectedPartialL = linear.Vector.create(partialLatW);
-        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
+        var expectation = linear.Vector.create([sum]);
+        var result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
 
-        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
+        assert.equal(expectation.e(1).toFixed(5), result.e(1).toFixed(5));
       });
     });
 
     describe('2 dependent variables', function() {
+      var sum;
+      var ThetaTx = [];
+
       beforeEach(function() {
-        w = linear.Vector.create([1,1]);
-        X = linear.Matrix.create([[1,2],[3,4],[5,6]]);
-        Y = linear.Vector.create([1,0,1]);
+        ThetaT = linear.Vector.create([1,1]);
+        X = linear.Matrix.create([[1,2],[3,4]]);
+        Y = linear.Vector.create([1,0]);
 
-        partialLatW = [0,0];
+        sum = [0,0];
 
-        // Simple enough to calculate the vector components
-        Z1 = 1 * 1 + 1 * 2;
-        Z2 = 1 * 3 + 1 * 4;
-        Z3 = 1 * 5 + 1 * 6;
+        ThetaTx[1] = 1 + 1 * 1 + 1 * 2;
+        ThetaTx[2] = 1 + 1 * 3 + 1 * 4;
 
-        partialLatW[0] += 1 * 1 * g(1, Z1);
-        partialLatW[0] += 0 * 3 * g(0, Z2);
-        partialLatW[0] += 1 * 5 * g(1, Z3);
+        // Spell out the steps
+        // J=0
+        //   i=1
+        sum[0] += (1.0 - subject.logistic(ThetaTx[1])) * 1.0;
+        //   i=2
+        sum[0] += (0.0 - subject.logistic(ThetaTx[2])) * 2.0;
 
-        partialLatW[1] += 1 * 2 * g(1, Z1);
-        partialLatW[1] += 0 * 4 * g(0, Z2);
-        partialLatW[1] += 1 * 6 * g(1, Z3);
+        // J=0
+        //   i=1
+        sum[1] += (1.0 - subject.logistic(ThetaTx[1])) * 3.0;
+        //   i=2
+        sum[1] += (0.0 - subject.logistic(ThetaTx[2])) * 4.0;
       });
 
       it('without regularization', function() {
         var C = 0.0;
 
-        expectedPartialL = linear.Vector.create(partialLatW);
+        expectation = linear.Vector.create(sum);
+        result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
 
-        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
-
-        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
-        assert.equal(expectedPartialL.e(2).toFixed(5), calculatedPartialL.e(2).toFixed(5));
+        assert.equal(expectation.e(1).toFixed(5), result.e(1).toFixed(5));
+        assert.equal(expectation.e(2).toFixed(5), result.e(2).toFixed(5));
       });
 
       it('WITH regularization', function() {
         var C = 0.1;
 
-        partialLatW[0] = -partialLatW[0] + C * 1;
-        partialLatW[1] = -partialLatW[1] + C * 1;
+        sum[0] = -sum[0]+ C * ThetaT.e(1);
+        sum[1] = -sum[1]+ C * ThetaT.e(2);
 
-        expectedPartialL = linear.Vector.create(partialLatW);
+        expectation = linear.Vector.create(sum);
+        result = subject.loglikelihoodGradient(ThetaT, X, Y, C);
 
-        var calculatedPartialL = subject.loglikelihoodGradient(w, X, Y, C);
-
-        assert.equal(expectedPartialL.e(1).toFixed(5), calculatedPartialL.e(1).toFixed(5));
-        assert.equal(expectedPartialL.e(2).toFixed(5), calculatedPartialL.e(2).toFixed(5));
+        assert.equal(expectation.e(1).toFixed(5), result.e(1).toFixed(5));
+        assert.equal(expectation.e(2).toFixed(5), result.e(2).toFixed(5));
       });
     });
   });
@@ -344,7 +340,7 @@ describe('Logistical', function(){
 
       var X = linear.Matrix.create(x);
       var Y = linear.Vector.create(y);
-      var C = 0.0001;
+      var C = 0.0000;
 
       assert.doesNotThrow(function() {
           subject.gradientDescent(X, Y, C);
@@ -353,7 +349,7 @@ describe('Logistical', function(){
       );
     });
 
-    it('converges on large data set', function() {
+    it.only('converges on large data set', function() {
       var x = large.training.slice(0);
       var y = [];
 
@@ -364,7 +360,7 @@ describe('Logistical', function(){
 
       var X = linear.Matrix.create(x);
       var Y = linear.Vector.create(y);
-      var C = 0.1;
+      var C = 0.0;
 
       assert.doesNotThrow(function() {
           subject.gradientDescent(X, Y, C);
